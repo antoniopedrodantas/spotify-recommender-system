@@ -1,13 +1,20 @@
-import './App.css';
+import "./App.css";
 
-// require('dotenv').config();
+// scenes
+import Home from "./scenes/Home/Home";
+import Feed from "./scenes/Feed/Feed";
+
+// dependencies
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 function App() {
   return (
-    <div className="App">
-      <p>{process.env.REACT_APP_CLIENT_ID}</p>
-      <p>{process.env.REACT_APP_CLIENT_SECRET}</p>
-    </div>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="feed" element={<Feed />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 
