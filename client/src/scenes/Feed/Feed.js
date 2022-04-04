@@ -35,11 +35,11 @@ function Feed() {
         id: element.id,
         name: element.name,
         genres: element.genres,
-        popularity: element.popularity
+        popularity: element.popularity,
       };
       setUserTopArtists((userTopArtists) => [...userTopArtists, artist]);
     });
-  };
+  }
 
   // creates userTopTracks array to later send them to the python server
   async function createUserTopTracks(tracks, access_token) {
@@ -83,6 +83,22 @@ function Feed() {
 
           setUserTopTracks((userTopTracks) => [...userTopTracks, track]);
         }
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }
+
+  // sends request to the server through the click of the button
+  const handleRecommendationsButtonCLick = () => {
+    // sends information to the server
+    axios
+      .post("http://127.0.0.1:5000/", {
+        artists: userTopArtists,
+        tracks: userTopTracks,
+      })
+      .then((response) => {
+        console.log(response);
       })
       .catch((error) => {
         console.log(error);
@@ -157,9 +173,9 @@ function Feed() {
       <p>You have reached the feed</p>
       <p>{userData}</p>
       <br></br>
-      <p>{JSON.stringify(userTopArtists)}</p>
-      <br></br>
-      <p>{JSON.stringify(userTopTracks)}</p>
+      <button onClick={() => handleRecommendationsButtonCLick()}>
+        Get recommendations
+      </button>
     </div>
   );
 }
