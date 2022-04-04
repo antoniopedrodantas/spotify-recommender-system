@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request
 from flask_cors import CORS
 
 app = Flask(__name__)
@@ -11,8 +11,22 @@ def recommendation_generator():
 
     request_data = request.get_json()
 
-    print(request_data)
+    artists_data = request_data["artists"]
+    tracks_data = request_data["tracks"]
+
+    artists = []
+    tracks = []
+
+    for artist in artists_data:
+        artists.append(artist["name"])
+
+    for track in tracks_data:
+        tracks.append(track["name"])
+
+    print(artists)
+    print(tracks)
+
     return ""
 
 if __name__ == "__main__":
-    app.run()
+    app.run(debug=True)
