@@ -1,8 +1,35 @@
 from flask import Flask, request
 from flask_cors import CORS
 
+from src.reward import Reward
+from src.methods import update_reward_function, get_policy_limit
+
 app = Flask(__name__)
 CORS(app)
+
+# ------------------------------------
+# -  INVERSE REINFORCEMENT LEARNING  -
+# ------------------------------------
+
+# ---------- REWARD FUNTION ----------
+
+# should have the parameters: 
+#   danceability,
+#   energy,
+#   instrumentalness,
+#   liveness,
+#   loudness,
+#   speechiness,
+#   valence
+
+# the reward function will analyse the parameters of every track and output the "perfect" value for every parameter.
+
+# ---------- POLICY ----------
+
+# the policy whether to like it or not is the max difference from the track from the song set.
+# meaning that every song that has a difference greater from that one track is not going to be liked
+# the slimmer the distance the best the track is
+
 
 @app.route("/", methods=['POST'])
 def recommendation_generator():
@@ -11,20 +38,34 @@ def recommendation_generator():
 
     request_data = request.get_json()
 
-    artists_data = request_data["artists"]
     tracks_data = request_data["tracks"]
 
-    artists = []
-    tracks = []
+    # creates reward function and updates it according to the user's top tracks
+    reward_function = Reward()
+    update_reward_function(reward_function, tracks_data)
 
-    for artist in artists_data:
-        artists.append(artist["name"])
+    # gets the max distance from reward score that tells if a song is going to be liked or not
+    policy_limit = get_policy_limit(reward_function, tracks_data)
 
-    for track in tracks_data:
-        tracks.append(track["name"])
+    print("Here are the perfect song parameter values as the reward function:")
+    print(" danceability: ", reward_function.danceability)
+    print(" energy: ", reward_function.energy)
+    print(" instrumentalness: ", reward_function.instrumentalness)
+    print(" liveness: ", reward_function.liveness)
+    print(" loudness: ", reward_function.loudness)
+    print(" speechiness: ", reward_function.speechiness)
+    print(" valence: ", reward_function.valence)
 
-    print(artists)
-    print(tracks)
+    print("\n")
+
+    print("To calculate the reward value of a song we add the absolute difference value of each of its parameters with the reward function.")
+
+    print("\n")
+
+    print("The policy limit to which a song is considered good or not: ", policy_limit)
+    print("This is the track from the song set that has the highest difference, therefore every new song it is analysed that surpasses this value is considered to be not good.")
+    print("The lower the reward value, the more the user is likeky going to like it.")
+
 
     return ""
 
