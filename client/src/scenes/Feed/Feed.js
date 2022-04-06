@@ -4,16 +4,19 @@ import axios from "axios";
 
 function Feed() {
   // user data state variable
-  const [userData, setUserData] = useState("");
+  const [userData, setUserData] = useState({});
   const [userTopArtists, setUserTopArtists] = useState([]);
   const [userTopTracks, setUserTopTracks] = useState([]);
+  const [userTestTracks, setUserTestTracks] = useState([]);
 
   // Spotify API endpoints
   const USER_INFO_ENDPOINT = "https://api.spotify.com/v1/me";
   const USER_ARTISTS_ENDPOINT =
-    "https://api.spotify.com/v1/me/top/artists?limit=50";
+    "https://api.spotify.com/v1/me/top/artists?limit=20";
   const USER_TRACKS_ENDPOINT =
     "https://api.spotify.com/v1/me/top/tracks?limit=50";
+  // let USER_SEARCH_ENDPOINT =
+  //   "https://api.spotify.com/v1/search?q=genre:rock+tag:hipster&type=track&limit=50";
 
   // gets the return token values from the Spotify's API
   const getReturnedParamsFromSpotifyAuth = (hash) => {
@@ -29,20 +32,7 @@ function Feed() {
   };
 
   // creates userTopTracks array to later send them to the python server
-  async function createUserTopArtists(artists) {
-    artists.forEach((element) => {
-      const artist = {
-        id: element.id,
-        name: element.name,
-        genres: element.genres,
-        popularity: element.popularity,
-      };
-      setUserTopArtists((userTopArtists) => [...userTopArtists, artist]);
-    });
-  }
-
-  // creates userTopTracks array to later send them to the python server
-  async function createUserTopTracks(tracks, access_token) {
+  async function createUserTracks(tracks, access_token, type) {
     let ids = "";
 
     tracks.forEach((element) => {
@@ -81,7 +71,11 @@ function Feed() {
             valence: audio_features[i].valence,
           };
 
-          setUserTopTracks((userTopTracks) => [...userTopTracks, track]);
+          if (type === "top") {
+            setUserTopTracks((userTopTracks) => [...userTopTracks, track]);
+          } else if (type === "test") {
+            setUserTestTracks((userTestTracks) => [...userTestTracks, track]);
+          }
         }
       })
       .catch((error) => {
@@ -94,8 +88,8 @@ function Feed() {
     // sends information to the server
     axios
       .post("http://127.0.0.1:5000/", {
-        artists: userTopArtists,
-        tracks: userTopTracks,
+        top_tracks: userTopTracks,
+        test_tracks: userTestTracks,
       })
       .then((response) => {
         console.log(response);
@@ -128,12 +122,15 @@ function Feed() {
             },
           })
           .then((response) => {
-            setUserData(JSON.stringify(response.data));
+            setUserData(response.data);
             console.log("Got user data!");
           })
           .catch((error) => {
             console.log(error);
           });
+
+        // list of genres the user is into
+        let genres = [];
 
         // gets user's top artists
         await axios
@@ -143,7 +140,27 @@ function Feed() {
             },
           })
           .then((response) => {
-            createUserTopArtists(response.data.items);
+            const artists = response.data.items;
+            artists.forEach((element) => {
+              const artist = {
+                id: element.id,
+                name: element.name,
+                genres: element.genres,
+                popularity: element.popularity,
+              };
+              setUserTopArtists((userTopArtists) => [
+                ...userTopArtists,
+                artist,
+              ]);
+
+              // adds to genres array the genre of each artist he is into
+              if (element.genres[0] !== undefined) {
+                const newGenre = element.genres[0].replaceAll(" ", "_");
+                if (!genres.includes(newGenre)) {
+                  genres.push(newGenre);
+                }
+              }
+            });
             console.log("Got top artists data!");
           })
           .catch((error) => {
@@ -158,24 +175,76 @@ function Feed() {
             },
           })
           .then((response) => {
-            createUserTopTracks(response.data.items, access_token);
+            createUserTracks(response.data.items, access_token, "top");
             console.log("Got top tracks data!");
           })
           .catch((error) => {
             console.log(error);
           });
+
+        genres.forEach((genre) => {
+          const USER_SEARCH_ENDPOINT = `https://api.spotify.com/v1/search?q=genre:${genre}+tag:hipster&type=track&limit=10`;
+
+          // gets user's list of tracks it might like
+          axios
+            .get(USER_SEARCH_ENDPOINT, {
+              headers: {
+                Authorization: "Bearer " + access_token,
+              },
+            })
+            .then((response) => {
+              createUserTracks(
+                response.data.tracks.items,
+                access_token,
+                "test"
+              );
+              console.log("Got test tracks data from the ", genre, "genre!");
+            })
+            .catch((error) => {
+              console.log(error);
+            });
+        });
       }
     })();
   }, []);
 
+  // renders recommendation button after all useStates are filled up
+  const renderRecommendationsButton = () => {
+    if (userTopTracks.length >= 0 && userTestTracks.length >= 0) {
+      return (
+        <button onClick={() => handleRecommendationsButtonCLick()}>
+          Get recommendations
+        </button>
+      );
+    } else {
+      return <></>;
+    }
+  };
+
+  const renderTopArtists = () => {
+    let artists = "";
+    userTopArtists.forEach((artist) => {
+      artists = artists + ", " + artist.name;
+    });
+    artists = artists + "."
+    return <p>{artists}</p>;
+  };
+
   return (
     <div>
-      <p>You have reached the feed</p>
-      <p>{userData}</p>
+      <p>
+        Hello, {userData.display_name}. Welcome to our Spotify recommendation
+        system.
+      </p>
       <br></br>
-      <button onClick={() => handleRecommendationsButtonCLick()}>
-        Get recommendations
-      </button>
+      <p>We can already see you're a big fan of:</p>
+      {renderTopArtists()}
+      <br></br>
+      <p>
+        Do you want to get new song recommendations based on an IRL approach?
+        Click below.
+      </p>
+      {renderRecommendationsButton()}
     </div>
   );
 }

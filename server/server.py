@@ -38,7 +38,7 @@ def recommendation_generator():
 
     request_data = request.get_json()
 
-    tracks_data = request_data["tracks"]
+    tracks_data = request_data["top_tracks"]
 
     # creates reward function and updates it according to the user's top tracks
     reward_function = Reward()
