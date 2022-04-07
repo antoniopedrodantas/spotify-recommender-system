@@ -54,7 +54,7 @@ def recommendation_generator():
     print(" energy: ", reward_function.energy)
     print(" instrumentalness: ", reward_function.instrumentalness)
     print(" liveness: ", reward_function.liveness)
-    print(" loudness: ", reward_function.loudness)
+    # print(" loudness: ", reward_function.loudness)
     print(" speechiness: ", reward_function.speechiness)
     print(" valence: ", reward_function.valence)
 

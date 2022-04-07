@@ -3,6 +3,5 @@ class Reward:
     energy = 0
     instrumentalness = 0
     liveness = 0
-    loudness = 0
     speechiness = 0
     valence = 0
