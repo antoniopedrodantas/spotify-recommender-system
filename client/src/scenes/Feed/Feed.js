@@ -183,7 +183,7 @@ function Feed() {
           });
 
         genres.forEach((genre) => {
-          const USER_SEARCH_ENDPOINT = `https://api.spotify.com/v1/search?q=genre:${genre}+tag:hipster&type=track&limit=10`;
+          const USER_SEARCH_ENDPOINT = `https://api.spotify.com/v1/search?q=genre:${genre}+tag:hipster&type=track&limit=50`;
 
           // gets user's list of tracks it might like
           axios

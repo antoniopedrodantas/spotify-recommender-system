@@ -2,7 +2,8 @@ from flask import Flask, request
 from flask_cors import CORS
 
 from src.reward import Reward
-from src.methods import update_reward_function, get_policy_limit
+from src.song import Song
+from src.methods import update_reward_function, get_policy_limit, get_test_song_scores
 
 app = Flask(__name__)
 CORS(app)
@@ -38,14 +39,15 @@ def recommendation_generator():
 
     request_data = request.get_json()
 
-    tracks_data = request_data["top_tracks"]
+    top_tracks_data = request_data["top_tracks"]
+    test_tracks_data = request_data["test_tracks"]
 
     # creates reward function and updates it according to the user's top tracks
     reward_function = Reward()
-    update_reward_function(reward_function, tracks_data)
+    update_reward_function(reward_function, top_tracks_data)
 
     # gets the max distance from reward score that tells if a song is going to be liked or not
-    policy_limit = get_policy_limit(reward_function, tracks_data)
+    policy_limit = get_policy_limit(reward_function, top_tracks_data)
 
     print("Here are the perfect song parameter values as the reward function:")
     print(" danceability: ", reward_function.danceability)
@@ -65,6 +67,10 @@ def recommendation_generator():
     print("The policy limit to which a song is considered good or not: ", policy_limit)
     print("This is the track from the song set that has the highest difference, therefore every new song it is analysed that surpasses this value is considered to be not good.")
     print("The lower the reward value, the more the user is likeky going to like it.")
+
+    test_tracks_results = sorted(get_test_song_scores(reward_function, test_tracks_data, policy_limit))
+
+    print(test_tracks_results)
 
 
     return ""

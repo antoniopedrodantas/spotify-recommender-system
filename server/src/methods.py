@@ -1,4 +1,5 @@
 from src.reward import Reward
+from src.song import Song
 
 # method creates values for reward function on every parameter
 def update_reward_function(reward_function, tracks_data):
@@ -45,6 +46,26 @@ def get_policy_limit(reward_function, tracks_data):
             policy_limit = policy_tmp
         
     return policy_limit
+
+def get_test_song_scores(reward_function, tracks_data, policy_limit):
+
+    song_results = []
+
+    for track in tracks_data:
+        track_score = 0
+
+        track_score += abs(reward_function.danceability - track["danceability"])
+        track_score += abs(reward_function.energy - track["energy"])
+        track_score += abs(reward_function.instrumentalness - track["instrumentalness"])
+        track_score += abs(reward_function.liveness - track["liveness"])
+        track_score += abs(reward_function.loudness - track["loudness"])
+        track_score += abs(reward_function.speechiness - track["speechiness"])
+        track_score += abs(reward_function.valence - track["valence"])
+
+        if track_score < policy_limit:
+            song_results.append(Song(track["id"], track["name"], track_score))
+
+    return song_results
 
 
 
