@@ -1,4 +1,5 @@
-from flask import Flask, request
+import json
+from flask import Flask, request, jsonify
 from flask_cors import CORS
 
 from src.reward import Reward
@@ -70,10 +71,11 @@ def recommendation_generator():
 
     test_tracks_results = sorted(get_test_song_scores(reward_function, test_tracks_data, policy_limit))
 
-    print(test_tracks_results)
+    response = []
+    for track in test_tracks_results:
+        response.append([track.id, track.name, track.score])
 
-
-    return ""
+    return jsonify(response)
 
 if __name__ == "__main__":
     app.run(debug=True)
