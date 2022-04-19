@@ -92,7 +92,7 @@ function Feed() {
         test_tracks: userTestTracks,
       })
       .then((response) => {
-        console.log(response);
+        window.location = "/results";
       })
       .catch((error) => {
         console.log(error);
