@@ -32,9 +32,6 @@ CORS(app)
 # meaning that every song that has a difference greater from that one track is not going to be liked
 # the slimmer the distance the best the track is
 
-# global variable response
-response = []
-
 @app.route("/", methods=['POST'])
 def recommendation_generator():
 
@@ -73,17 +70,11 @@ def recommendation_generator():
 
     test_tracks_results = sorted(get_test_song_scores(reward_function, test_tracks_data, policy_limit))
 
+    response = []
     for track in test_tracks_results:
         item = [track.id, track.name, track.score]
         if item not in response:
             response.append(item)
-
-    return jsonify(response)
-
-@app.route("/", methods=['GET'])
-def recommendation_getter():
-
-    print("server was reached!")
 
     return jsonify(response)
 

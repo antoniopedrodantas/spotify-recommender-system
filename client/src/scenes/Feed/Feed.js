@@ -2,12 +2,17 @@ import React, { useEffect, useState } from "react";
 
 import axios from "axios";
 
+import Results from "../Results/Results";
+
 function Feed() {
   // user data state variable
   const [userData, setUserData] = useState({});
   const [userTopArtists, setUserTopArtists] = useState([]);
   const [userTopTracks, setUserTopTracks] = useState([]);
   const [userTestTracks, setUserTestTracks] = useState([]);
+
+  const [userRecommendations, setUserRecommendations] = useState({});
+  const [resultsFlag, setResultsFlag] = useState(false);
 
   // Spotify API endpoints
   const USER_INFO_ENDPOINT = "https://api.spotify.com/v1/me";
@@ -92,11 +97,18 @@ function Feed() {
         test_tracks: userTestTracks,
       })
       .then((response) => {
-        window.location = "/results";
+        setUserRecommendations(response);
+        setResultsFlag(true);
       })
       .catch((error) => {
         console.log(error);
       });
+  };
+
+  // sends request to the server through the click of the button
+  const handleLogoutButtonCLick = () => {
+    localStorage.clear();
+    window.location = "/";
   };
 
   // fetches url tokens on page load
@@ -208,13 +220,27 @@ function Feed() {
     })();
   }, []);
 
+  const renderLogoutButton = () => {
+    return <button onClick={() => handleLogoutButtonCLick()}>Logout</button>;
+  };
+
   // renders recommendation button after all useStates are filled up
   const renderRecommendationsButton = () => {
-    if (userTopTracks.length >= 0 && userTestTracks.length >= 0) {
+    if (
+      userTopTracks.length >= 0 &&
+      userTestTracks.length >= 0 &&
+      resultsFlag === false
+    ) {
       return (
-        <button onClick={() => handleRecommendationsButtonCLick()}>
-          Get recommendations
-        </button>
+        <div>
+          <p>
+            Do you want to get new song recommendations based on an IRL
+            approach? Click below.
+          </p>
+          <button onClick={() => handleRecommendationsButtonCLick()}>
+            Get recommendations
+          </button>
+        </div>
       );
     } else {
       return <></>;
@@ -226,12 +252,25 @@ function Feed() {
     userTopArtists.forEach((artist) => {
       artists = artists + ", " + artist.name;
     });
-    artists = artists + "."
+    artists = artists + ".";
     return <p>{artists}</p>;
+  };
+
+  const renderRecommendationsResults = () => {
+    if (resultsFlag) {
+      return (
+        <div>
+          <Results state={userRecommendations} />
+        </div>
+      );
+    } else {
+      return <></>;
+    }
   };
 
   return (
     <div>
+      {renderLogoutButton()}
       <p>
         Hello, {userData.display_name}. Welcome to our Spotify recommendation
         system.
@@ -240,11 +279,8 @@ function Feed() {
       <p>We can already see you're a big fan of:</p>
       {renderTopArtists()}
       <br></br>
-      <p>
-        Do you want to get new song recommendations based on an IRL approach?
-        Click below.
-      </p>
       {renderRecommendationsButton()}
+      {renderRecommendationsResults()}
     </div>
   );
 }
