@@ -1,3 +1,4 @@
+from cgi import test
 import json
 from flask import Flask, request, jsonify
 from flask_cors import CORS
@@ -40,7 +41,9 @@ def recommendation_generator():
     request_data = request.get_json()
 
     top_tracks_data = request_data["top_tracks"]
+    print(top_tracks_data)
     test_tracks_data = request_data["test_tracks"]
+    print(test_tracks_data)
 
     # creates reward function and updates it according to the user's top tracks
     reward_function = Reward()

@@ -59,30 +59,49 @@ function Feed() {
       })
       .then((response) => {
         // gets audio features from response
-        audio_features = response.data.audio_features;
+        const audio_features = response.data.audio_features;
 
         // creates new track object and adds it to userTopTracks
         for (let i = 0; i < tracks.length; i++) {
-          const track = {
-            id: tracks[i].id,
-            name: tracks[i].name,
-            danceability: audio_features[i].danceability,
-            duration_ms: audio_features[i].duration_ms,
-            energy: audio_features[i].energy,
-            instrumentalness: audio_features[i].instrumentalness,
-            liveness: audio_features[i].liveness,
-            loudness: audio_features[i].loudness,
-            speechiness: audio_features[i].speechiness,
-            tempo: audio_features[i].tempo,
-            time_signature: audio_features[i].time_signature,
-            valence: audio_features[i].valence,
-          };
+          axios
+            .get(
+              `https://api.spotify.com/v1/artists?ids=${tracks[i].artists[0].id}`,
+              {
+                headers: {
+                  Authorization: "Bearer " + access_token,
+                },
+              }
+            )
+            .then((response2) => {
+              const trackGenre = response2.data.artists[0].genres[0];
+              const track = {
+                id: tracks[i].id,
+                name: tracks[i].name,
+                danceability: audio_features[i].danceability,
+                duration_ms: audio_features[i].duration_ms,
+                energy: audio_features[i].energy,
+                instrumentalness: audio_features[i].instrumentalness,
+                liveness: audio_features[i].liveness,
+                loudness: audio_features[i].loudness,
+                speechiness: audio_features[i].speechiness,
+                tempo: audio_features[i].tempo,
+                time_signature: audio_features[i].time_signature,
+                valence: audio_features[i].valence,
+                genre: trackGenre,
+              };
 
-          if (type === "top") {
-            setUserTopTracks((userTopTracks) => [...userTopTracks, track]);
-          } else if (type === "test") {
-            setUserTestTracks((userTestTracks) => [...userTestTracks, track]);
-          }
+              if (type === "top") {
+                setUserTopTracks((userTopTracks) => [...userTopTracks, track]);
+              } else if (type === "test") {
+                setUserTestTracks((userTestTracks) => [
+                  ...userTestTracks,
+                  track,
+                ]);
+              }
+            })
+            .catch((error) => {
+              console.log(error);
+            });
         }
       })
       .catch((error) => {
@@ -156,7 +175,7 @@ function Feed() {
           .then((response) => {
             const artists = response.data.items;
 
-            if(artists.length > 0){
+            if (artists.length > 0) {
               setRecommendationButtonFlag(true);
             }
 
