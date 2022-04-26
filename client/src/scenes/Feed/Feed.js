@@ -13,6 +13,8 @@ function Feed() {
 
   const [userRecommendations, setUserRecommendations] = useState({});
   const [resultsFlag, setResultsFlag] = useState(false);
+  const [recommendationButtonFlag, setRecommendationButtonFlag] =
+    useState(false);
 
   // Spotify API endpoints
   const USER_INFO_ENDPOINT = "https://api.spotify.com/v1/me";
@@ -36,7 +38,7 @@ function Feed() {
     return paramsSplitUp;
   };
 
-  // creates userTopTracks array to later send them to the python server
+  // creates userTopTracks and userTestTracks array to later send them to the python server
   async function createUserTracks(tracks, access_token, type) {
     let ids = "";
 
@@ -153,6 +155,11 @@ function Feed() {
           })
           .then((response) => {
             const artists = response.data.items;
+
+            if(artists.length > 0){
+              setRecommendationButtonFlag(true);
+            }
+
             artists.forEach((element) => {
               const artist = {
                 id: element.id,
@@ -229,7 +236,8 @@ function Feed() {
     if (
       userTopTracks.length >= 0 &&
       userTestTracks.length >= 0 &&
-      resultsFlag === false
+      resultsFlag === false &&
+      recommendationButtonFlag === true
     ) {
       return (
         <div>
@@ -248,12 +256,26 @@ function Feed() {
   };
 
   const renderTopArtists = () => {
-    let artists = "";
-    userTopArtists.forEach((artist) => {
-      artists = artists + ", " + artist.name;
-    });
-    artists = artists + ".";
-    return <p>{artists}</p>;
+    if (!recommendationButtonFlag) {
+      return (
+        <p>
+          We're sorry. There isn't enough information to create recommendtions
+          for you. You need to listen to some more music.
+        </p>
+      );
+    } else {
+      let artists = "";
+      userTopArtists.forEach((artist) => {
+        artists = artists + ", " + artist.name;
+      });
+      artists = artists + ".";
+      return (
+        <div>
+          <p>We can already see you're a big fan of:</p>
+          <p>{artists}</p>
+        </div>
+      );
+    }
   };
 
   const renderRecommendationsResults = () => {
@@ -276,7 +298,6 @@ function Feed() {
         system.
       </p>
       <br></br>
-      <p>We can already see you're a big fan of:</p>
       {renderTopArtists()}
       <br></br>
       {renderRecommendationsButton()}
