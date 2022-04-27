@@ -48,7 +48,7 @@ function Feed() {
     });
 
     ids = ids.substring(0, ids.length - 1);
-    let audio_features;
+    // let audio_features;
 
     // gets tracks audio features
     await axios
@@ -73,7 +73,18 @@ function Feed() {
               }
             )
             .then((response2) => {
-              const trackGenre = response2.data.artists[0].genres[0];
+              let trackGenre = response2.data.artists[0].genres[0];
+
+              // if (type === "top") {
+              //   if (!genres.includes(trackGenre)) {
+              //     setGenres((genres) => [...genres, trackGenre]);
+              //   }
+              // }
+
+              if (!trackGenre) {
+                trackGenre = "undefined";
+              }
+
               const track = {
                 id: tracks[i].id,
                 name: tracks[i].name,
