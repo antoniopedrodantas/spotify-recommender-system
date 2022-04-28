@@ -20,7 +20,7 @@ def update_reward_function(reward_function, tracks_data):
     for track in tracks_data:
         if track["genre"] not in reward_function:
             reward_function[track["genre"]] = Reward()
-
+    
     # for every genre in the reward function iterates through top tracks and finds out the best values for them
     for genre in reward_function:
         # array that holds all the tracks belonging to a genre

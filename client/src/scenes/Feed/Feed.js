@@ -69,7 +69,7 @@ function Feed() {
 
           // if the genre is "" then it is a top track and we need to find out what its genre is
           // if it is a test track it already comes in the function call
-          if (trackGenre === "") {
+          if (trackGenre === "" && type === "top") {
             axios
               .get(
                 `https://api.spotify.com/v1/artists?ids=${tracks[i].artists[0].id}`,
@@ -86,34 +86,49 @@ function Feed() {
                 if (!trackGenre) {
                   trackGenre = "undefined";
                 }
+
+                // creates track object that adds to the state variable
+                const track = {
+                  id: tracks[i].id,
+                  name: tracks[i].name,
+                  artist: tracks[i].artists[0].name,
+                  danceability: audio_features[i].danceability,
+                  duration_ms: audio_features[i].duration_ms,
+                  energy: audio_features[i].energy,
+                  instrumentalness: audio_features[i].instrumentalness,
+                  liveness: audio_features[i].liveness,
+                  loudness: audio_features[i].loudness,
+                  speechiness: audio_features[i].speechiness,
+                  tempo: audio_features[i].tempo,
+                  time_signature: audio_features[i].time_signature,
+                  valence: audio_features[i].valence,
+                  genre: trackGenre,
+                };
+
+                setUserTopTracks((userTopTracks) => [...userTopTracks, track]);
               })
               .catch((error) => {
                 console.log(error);
               });
           }
-
-          // creates track object that adds to the state variable
-          const track = {
-            id: tracks[i].id,
-            name: tracks[i].name,
-            artist: tracks[i].artists[0].name,
-            danceability: audio_features[i].danceability,
-            duration_ms: audio_features[i].duration_ms,
-            energy: audio_features[i].energy,
-            instrumentalness: audio_features[i].instrumentalness,
-            liveness: audio_features[i].liveness,
-            loudness: audio_features[i].loudness,
-            speechiness: audio_features[i].speechiness,
-            tempo: audio_features[i].tempo,
-            time_signature: audio_features[i].time_signature,
-            valence: audio_features[i].valence,
-            genre: trackGenre,
-          };
-
-          // adds to userTopTracks and userTestTracks accordingly
-          if (type === "top") {
-            setUserTopTracks((userTopTracks) => [...userTopTracks, track]);
-          } else if (type === "test") {
+          if (trackGenre !== "" && type === "test") {
+            // creates track object that adds to the state variable
+            const track = {
+              id: tracks[i].id,
+              name: tracks[i].name,
+              artist: tracks[i].artists[0].name,
+              danceability: audio_features[i].danceability,
+              duration_ms: audio_features[i].duration_ms,
+              energy: audio_features[i].energy,
+              instrumentalness: audio_features[i].instrumentalness,
+              liveness: audio_features[i].liveness,
+              loudness: audio_features[i].loudness,
+              speechiness: audio_features[i].speechiness,
+              tempo: audio_features[i].tempo,
+              time_signature: audio_features[i].time_signature,
+              valence: audio_features[i].valence,
+              genre: trackGenre,
+            };
             setUserTestTracks((userTestTracks) => [...userTestTracks, track]);
           }
         }
@@ -212,7 +227,7 @@ function Feed() {
           .catch((error) => {
             console.log(error);
           });
-        
+
         // iterates through the genre array
         genres.forEach((genre) => {
           const USER_SEARCH_ENDPOINT = `https://api.spotify.com/v1/search?q=genre:${genre}+tag:hipster&type=track&limit=50`;
