@@ -9,6 +9,8 @@ function Results(state) {
   const [contentOffset, setContentOffset] = useState(0);
   const [noMoreContent, setNoMoreContent] = useState(false);
 
+  // ============================================== useEffect ==============================================
+
   useEffect(() => {
     setResponse(state.state.data);
 
@@ -37,6 +39,8 @@ function Results(state) {
         console.log(error);
       });
   }, []);
+
+  // ============================================== Handlers ==============================================
 
   const handleLoadContentButtonCLick = () => {
     try {
@@ -75,6 +79,8 @@ function Results(state) {
     }
   };
 
+  // ============================================== Renders ==============================================
+
   const renderResults = () => {
     return (
       <div>
@@ -104,6 +110,8 @@ function Results(state) {
       );
     }
   };
+
+  // ============================================== return ==============================================
 
   return (
     <>
