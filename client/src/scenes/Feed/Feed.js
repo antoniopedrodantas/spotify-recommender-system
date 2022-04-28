@@ -39,7 +39,7 @@ function Feed() {
   };
 
   // creates userTopTracks and userTestTracks array to later send them to the python server
-  async function createUserTracks(tracks, access_token, type) {
+  async function createUserTracks(tracks, access_token, type, genre) {
     let ids = "";
 
     tracks.forEach((element) => {
@@ -63,57 +63,52 @@ function Feed() {
 
         // creates new track object and adds it to userTopTracks
         for (let i = 0; i < tracks.length; i++) {
-          axios
-            .get(
-              `https://api.spotify.com/v1/artists?ids=${tracks[i].artists[0].id}`,
-              {
-                headers: {
-                  Authorization: "Bearer " + access_token,
-                },
-              }
-            )
-            .then((response2) => {
-              let trackGenre = response2.data.artists[0].genres[0];
+        let trackGenre = genre
 
-              // if (type === "top") {
-              //   if (!genres.includes(trackGenre)) {
-              //     setGenres((genres) => [...genres, trackGenre]);
-              //   }
-              // }
+          if (trackGenre === "") {
+            axios
+              .get(
+                `https://api.spotify.com/v1/artists?ids=${tracks[i].artists[0].id}`,
+                {
+                  headers: {
+                    Authorization: "Bearer " + access_token,
+                  },
+                }
+              )
+              .then((response2) => {
+                trackGenre = response2.data.artists[0].genres[0];
 
-              if (!trackGenre) {
-                trackGenre = "undefined";
-              }
+                if (!trackGenre) {
+                  trackGenre = "undefined";
+                }
+              })
+              .catch((error) => {
+                console.log(error);
+              });
+          }
 
-              const track = {
-                id: tracks[i].id,
-                name: tracks[i].name,
-                artist: tracks[i].artists[0].name,
-                danceability: audio_features[i].danceability,
-                duration_ms: audio_features[i].duration_ms,
-                energy: audio_features[i].energy,
-                instrumentalness: audio_features[i].instrumentalness,
-                liveness: audio_features[i].liveness,
-                loudness: audio_features[i].loudness,
-                speechiness: audio_features[i].speechiness,
-                tempo: audio_features[i].tempo,
-                time_signature: audio_features[i].time_signature,
-                valence: audio_features[i].valence,
-                genre: trackGenre,
-              };
+          const track = {
+            id: tracks[i].id,
+            name: tracks[i].name,
+            artist: tracks[i].artists[0].name,
+            danceability: audio_features[i].danceability,
+            duration_ms: audio_features[i].duration_ms,
+            energy: audio_features[i].energy,
+            instrumentalness: audio_features[i].instrumentalness,
+            liveness: audio_features[i].liveness,
+            loudness: audio_features[i].loudness,
+            speechiness: audio_features[i].speechiness,
+            tempo: audio_features[i].tempo,
+            time_signature: audio_features[i].time_signature,
+            valence: audio_features[i].valence,
+            genre: trackGenre,
+          };
 
-              if (type === "top") {
-                setUserTopTracks((userTopTracks) => [...userTopTracks, track]);
-              } else if (type === "test") {
-                setUserTestTracks((userTestTracks) => [
-                  ...userTestTracks,
-                  track,
-                ]);
-              }
-            })
-            .catch((error) => {
-              console.log(error);
-            });
+          if (type === "top") {
+            setUserTopTracks((userTopTracks) => [...userTopTracks, track]);
+          } else if (type === "test") {
+            setUserTestTracks((userTestTracks) => [...userTestTracks, track]);
+          }
         }
       })
       .catch((error) => {
@@ -225,7 +220,7 @@ function Feed() {
             },
           })
           .then((response) => {
-            createUserTracks(response.data.items, access_token, "top");
+            createUserTracks(response.data.items, access_token, "top", "");
             console.log("Got top tracks data!");
           })
           .catch((error) => {
@@ -246,7 +241,8 @@ function Feed() {
               createUserTracks(
                 response.data.tracks.items,
                 access_token,
-                "test"
+                "test",
+                genre
               );
               console.log("Got test tracks data from the ", genre, "genre!");
             })

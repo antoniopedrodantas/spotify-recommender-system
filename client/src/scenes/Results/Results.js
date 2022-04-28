@@ -9,9 +9,7 @@ function Results(state) {
   const [contentOffset, setContentOffset] = useState(0);
   const [noMoreContent, setNoMoreContent] = useState(false);
 
-
   useEffect(() => {
-
     setResponse(state.state.data);
 
     let tracks = state.state.data;
@@ -25,20 +23,19 @@ function Results(state) {
 
     // gets tracks audio features
     axios
-    .get(`https://api.spotify.com/v1/tracks?ids=${ids}`, {
-      headers: {
-        Authorization: "Bearer " + localStorage.getItem("accessToken"),
-      },
-    })
-    .then((response) => {
-      // creates new track object and adds it to userTopTracks
-      setResults(response.data.tracks);
-      setContentOffset(contentOffset + 50)
-    })
-    .catch((error) => {
-      console.log(error);
-    });
-    
+      .get(`https://api.spotify.com/v1/tracks?ids=${ids}`, {
+        headers: {
+          Authorization: "Bearer " + localStorage.getItem("accessToken"),
+        },
+      })
+      .then((response) => {
+        // creates new track object and adds it to userTopTracks
+        setResults(response.data.tracks);
+        setContentOffset(contentOffset + 50);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   }, []);
 
   const handleLoadContentButtonCLick = () => {
@@ -63,7 +60,9 @@ function Results(state) {
           // creates new track object and adds it to userTopTracks
           let newTracks = res.data.tracks;
           newTracks.forEach((element) => {
-            setResults((results) => [...results, element]);
+            if (element.album.images.length > 0) {
+              setResults((results) => [...results, element]);
+            }
           });
         })
         .catch((error) => {
