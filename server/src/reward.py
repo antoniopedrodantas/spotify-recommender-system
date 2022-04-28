@@ -6,4 +6,3 @@ class Reward:
     speechiness = 0
     valence = 0
 
-    # hashMap = {genre, class Params}

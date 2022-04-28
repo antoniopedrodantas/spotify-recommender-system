@@ -40,30 +40,16 @@ def recommendation_generator():
 
     request_data = request.get_json()
 
-    print("TOP: ")
     top_tracks_data = request_data["top_tracks"]
-    for track in top_tracks_data:
-        print(track['name'], ": ", track['genre'])
-    print("TEST: ")
     test_tracks_data = request_data["test_tracks"]
-    for track in test_tracks_data:
-        print(track['genre'])
 
     # creates reward function and updates it according to the user's top tracks
-    reward_function = Reward()
+    reward_function_params = Reward()
+    reward_function = {"undefined": reward_function_params}
     update_reward_function(reward_function, top_tracks_data)
 
     # gets the max distance from reward score that tells if a song is going to be liked or not
     policy_limit = get_policy_limit(reward_function, top_tracks_data)
-
-    print("Here are the perfect song parameter values as the reward function:")
-    print(" danceability: ", reward_function.danceability)
-    print(" energy: ", reward_function.energy)
-    print(" instrumentalness: ", reward_function.instrumentalness)
-    print(" liveness: ", reward_function.liveness)
-    # print(" loudness: ", reward_function.loudness)
-    print(" speechiness: ", reward_function.speechiness)
-    print(" valence: ", reward_function.valence)
 
     print("\n")
 
@@ -71,7 +57,7 @@ def recommendation_generator():
 
     print("\n")
 
-    print("The policy limit to which a song is considered good or not: ", policy_limit)
+    print("The policy limit let's us know if a song is considered good or not")
     print("This is the track from the song set that has the highest difference, therefore every new song it is analysed that surpasses this value is considered to be not good.")
     print("The lower the reward value, the more the user is likeky going to like it.")
 
