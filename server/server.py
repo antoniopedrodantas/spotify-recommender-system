@@ -65,8 +65,15 @@ def recommendation_generator():
 
     response = []
     for track in test_tracks_results:
-        item = [track.id, track.name, track.score]
-        if item not in response:
+        item = [track.id, track.name, track.artist, track.score]
+        # it only recommends one track by artist
+        can_add = 0
+        for track_cmp in response:
+            if item[2] == track_cmp[2]:
+                can_add = 1
+        
+        # if the artist is not already in the response, it adds to it
+        if can_add == 0:
             response.append(item)
 
     return jsonify(response)

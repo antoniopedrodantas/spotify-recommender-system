@@ -88,6 +88,7 @@ function Feed() {
               const track = {
                 id: tracks[i].id,
                 name: tracks[i].name,
+                artist: tracks[i].artists[0].name,
                 danceability: audio_features[i].danceability,
                 duration_ms: audio_features[i].duration_ms,
                 energy: audio_features[i].energy,

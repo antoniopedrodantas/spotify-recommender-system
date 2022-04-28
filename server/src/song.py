@@ -1,8 +1,9 @@
 class Song:
 
-    def __init__(self, id, name, score):
+    def __init__(self, id, name, artist, score):
         self.id = id
         self.name = name
+        self.artist = artist
         self.score = score
 
     def __lt__(self, obj):

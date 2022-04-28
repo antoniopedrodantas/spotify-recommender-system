@@ -23,11 +23,25 @@ def update_reward_function(reward_function, tracks_data):
 
     # for every genre in the reward function iterates through top tracks and finds out the best values for them
     for genre in reward_function:
+        # array that holds all the tracks belonging to a genre
+        # it uses this array to create the parameter values for that genre
         genre_tracks = []
+        # flag that tells if a genre is not present in the top tracks
+        genre_undefined = 0
         for track in tracks_data:
             if track["genre"] == genre:
+                # if it finds a song belonging to that genre adds it to the array
+                # updates flag and says that it has at least one genre
                 genre_tracks.append(track)
+                genre_undefined = 1
+        
+        # if it did not find any song for that genre, adds all the songs to the "undefined" genre
+        # this will create parameter values undifined genre that are common to every song
+        if genre_undefined == 0:
+            genre_tracks = tracks_data
 
+
+        # array that holds all genre_tracks parameter values
         danceability_array = []
         energy_array = []
         instrumentalness_array = []
@@ -40,7 +54,6 @@ def update_reward_function(reward_function, tracks_data):
             energy_array.append(track["energy"])
             instrumentalness_array.append(track["instrumentalness"])
             liveness_array.append(track["liveness"])
-            # loudness_array.append(track["loudness"])
             speechiness_array.append(track["speechiness"])
             valence_array.append(track["valence"])
         
@@ -100,10 +113,6 @@ def update_reward_function(reward_function, tracks_data):
         reward_function[genre].speechiness = value(speechiness)
         reward_function[genre].valence = value(valence)
 
-        
-
-
-
 # method gets the max value a track can get from as a reward
 # that serves as a limit to see if it is going to be liked or not
 def get_policy_limit(reward_function, tracks_data):
@@ -126,9 +135,6 @@ def get_policy_limit(reward_function, tracks_data):
     
     return policy_limit
 
-
-
-
 def get_test_song_scores(reward_function, tracks_data, policy_limit):
 
     # # =============================== implementation for first reward function with genres ===============================
@@ -148,6 +154,6 @@ def get_test_song_scores(reward_function, tracks_data, policy_limit):
                 track_score += abs(reward_function[genre].valence - track["valence"])
             
             if track_score < policy_limit[genre]:
-                song_results.append(Song(track["id"], track["name"], track_score))
+                song_results.append(Song(track["id"], track["name"], track["artist"], track_score))
 
     return song_results
