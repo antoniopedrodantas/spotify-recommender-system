@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 
 import axios from "axios";
 
-import Results from "../Results/Results";
+import Results from "../../components/Results/Results";
 import CreatePlaylistButton from "../../components/CreatePlaylistButton/CreatePlaylistButton";
 
 function Feed() {

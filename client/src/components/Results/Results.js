@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 
 import axios from "axios";
 
-function Results(state) {
+function Results(props) {
   const [response, setResponse] = useState([]);
   const [results, setResults] = useState([]);
 
@@ -12,9 +12,9 @@ function Results(state) {
   // ============================================== useEffect ==============================================
 
   useEffect(() => {
-    setResponse(state.state.data);
+    setResponse(props.state.data);
 
-    let tracks = state.state.data;
+    let tracks = props.state.data;
     let ids = "";
 
     for (let i = 0; i < 50; i++) {

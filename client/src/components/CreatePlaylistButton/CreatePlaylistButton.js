@@ -3,8 +3,6 @@ import React from "react";
 import axios from "axios";
 
 function CreatePlaylistButton(props) {
-  // ============================================== useEffect ==============================================
-
   // ============================================== Handlers ==============================================
 
   async function handleCreatePlaylistButtonCLick() {
@@ -57,8 +55,6 @@ function CreatePlaylistButton(props) {
         console.log(error);
       });
   }
-
-  // ============================================== Renders ==============================================
 
   // ============================================== return ==============================================
 
