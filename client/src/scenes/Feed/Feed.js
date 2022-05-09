@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 
 import Results from "../Results/Results";
+import CreatePlaylistButton from "../../components/CreatePlaylistButton/CreatePlaylistButton";
 
 function Feed() {
   // user data state variable
@@ -338,7 +339,12 @@ function Feed() {
     if (resultsFlag) {
       return (
         <div>
-          <Results state={userRecommendations} />
+          <div>
+            <CreatePlaylistButton state={userData} songs={userRecommendations} />
+          </div>
+          <div>
+            <Results state={userRecommendations} />
+          </div>
         </div>
       );
     } else {
