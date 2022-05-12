@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 
 import axios from "axios";
 
+import "./Feed.css";
+
 import Results from "../../components/Results/Results";
 import CreatePlaylistButton from "../../components/CreatePlaylistButton/CreatePlaylistButton";
 
@@ -14,8 +16,15 @@ function Feed() {
 
   // holds values of server side response
   const [userRecommendations, setUserRecommendations] = useState({});
-  // flags tell if its ok to show the results component and the "Get Recommendations" button
   const [resultsFlag, setResultsFlag] = useState(false);
+
+  // flag tell if its ok to show the spotify results
+  const [userSpotifyRecommendations, setUserSpotifyRecommendations] = useState(
+    {}
+  );
+  const [spotifyResultsFlag, setSpotifyResultsFlag] = useState(false);
+
+  // flags tell if its ok to show the results component and the "Get Recommendations" button
   const [recommendationButtonFlag, setRecommendationButtonFlag] =
     useState(false);
 
@@ -260,6 +269,12 @@ function Feed() {
   // ============================================== Handlers ==============================================
 
   // sends request to the server through the click of the button
+  const handleLogoutButtonCLick = () => {
+    localStorage.clear();
+    window.location = "/";
+  };
+
+  // sends request to the server through the click of the button
   const handleRecommendationsButtonCLick = () => {
     // sends information to the server
     axios
@@ -276,16 +291,53 @@ function Feed() {
       });
   };
 
-  // sends request to the server through the click of the button
-  const handleLogoutButtonCLick = () => {
-    localStorage.clear();
-    window.location = "/";
+  const handleSpotifyRecommendationsButtonCLick = () => {
+    userTopTracks.forEach((track) => {
+      axios
+        .get(
+          `https://api.spotify.com/v1/recommendations?seed_tracks=${track.id}`,
+          {
+            headers: {
+              Authorization: "Bearer " + localStorage.getItem("accessToken"),
+            },
+          }
+        )
+        .then((response) => {
+          console.log(response);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    });
   };
 
   // ============================================== Renders ==============================================
 
   const renderLogoutButton = () => {
     return <button onClick={() => handleLogoutButtonCLick()}>Logout</button>;
+  };
+
+  const renderTopArtists = () => {
+    if (!recommendationButtonFlag) {
+      return (
+        <p>
+          We're sorry. There isn't enough information to create recommendtions
+          for you. You need to listen to some more music.
+        </p>
+      );
+    } else {
+      let artists = "";
+      userTopArtists.forEach((artist) => {
+        artists = artists + ", " + artist.name;
+      });
+      artists = artists + ".";
+      return (
+        <div>
+          <p>We can already see you're a big fan of:</p>
+          <p>{artists}</p>
+        </div>
+      );
+    }
   };
 
   // renders recommendation button after all useStates are filled up
@@ -312,35 +364,15 @@ function Feed() {
     }
   };
 
-  const renderTopArtists = () => {
-    if (!recommendationButtonFlag) {
-      return (
-        <p>
-          We're sorry. There isn't enough information to create recommendtions
-          for you. You need to listen to some more music.
-        </p>
-      );
-    } else {
-      let artists = "";
-      userTopArtists.forEach((artist) => {
-        artists = artists + ", " + artist.name;
-      });
-      artists = artists + ".";
-      return (
-        <div>
-          <p>We can already see you're a big fan of:</p>
-          <p>{artists}</p>
-        </div>
-      );
-    }
-  };
-
   const renderRecommendationsResults = () => {
     if (resultsFlag) {
       return (
         <div>
           <div>
-            <CreatePlaylistButton state={userData} songs={userRecommendations} />
+            <CreatePlaylistButton
+              state={userData}
+              songs={userRecommendations}
+            />
           </div>
           <div>
             <Results state={userRecommendations} />
@@ -351,6 +383,31 @@ function Feed() {
       return <></>;
     }
   };
+
+  const renderSpotifyRecommendationsButton = () => {
+    if (
+      userTopTracks.length >= 0 &&
+      userTestTracks.length >= 0 &&
+      spotifyResultsFlag === false &&
+      recommendationButtonFlag === true
+    ) {
+      return (
+        <div>
+          <p>
+            Do you want to get new song recommendations based on an already
+            existing Spotify algorithm? Click below.
+          </p>
+          <button onClick={() => handleSpotifyRecommendationsButtonCLick()}>
+            Get recommendations
+          </button>
+        </div>
+      );
+    } else {
+      return <></>;
+    }
+  };
+
+  const renderSpotifyRecommendationsResults = () => {};
 
   // ============================================== return ==============================================
 
@@ -364,8 +421,16 @@ function Feed() {
       <br></br>
       {renderTopArtists()}
       <br></br>
-      {renderRecommendationsButton()}
-      {renderRecommendationsResults()}
+      <div className="recommendations-wrapper">
+        <div>
+          {renderRecommendationsButton()}
+          {renderRecommendationsResults()}
+        </div>
+        <div>
+          {renderSpotifyRecommendationsButton()}
+          {renderSpotifyRecommendationsResults()}
+        </div>
+      </div>
     </div>
   );
 }
