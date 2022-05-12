@@ -12,6 +12,8 @@ const SCOPES = [
   "user-top-read",
   "user-library-read",
   "user-follow-read",
+  "playlist-modify-private",
+  "playlist-modify-public"
 ];
 const SCOPES_URL_PARAM = SCOPES.join(SPACE_DELIMITER);
 

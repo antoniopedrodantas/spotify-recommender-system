@@ -2,7 +2,8 @@ import React, { useEffect, useState } from "react";
 
 import axios from "axios";
 
-import Results from "../Results/Results";
+import Results from "../../components/Results/Results";
+import CreatePlaylistButton from "../../components/CreatePlaylistButton/CreatePlaylistButton";
 
 function Feed() {
   // user data state variable
@@ -11,7 +12,9 @@ function Feed() {
   const [userTopTracks, setUserTopTracks] = useState([]);
   const [userTestTracks, setUserTestTracks] = useState([]);
 
+  // holds values of server side response
   const [userRecommendations, setUserRecommendations] = useState({});
+  // flags tell if its ok to show the results component and the "Get Recommendations" button
   const [resultsFlag, setResultsFlag] = useState(false);
   const [recommendationButtonFlag, setRecommendationButtonFlag] =
     useState(false);
@@ -22,8 +25,8 @@ function Feed() {
     "https://api.spotify.com/v1/me/top/artists?limit=20";
   const USER_TRACKS_ENDPOINT =
     "https://api.spotify.com/v1/me/top/tracks?limit=50";
-  // let USER_SEARCH_ENDPOINT =
-  //   "https://api.spotify.com/v1/search?q=genre:rock+tag:hipster&type=track&limit=50";
+
+  // ============================================== Methods ==============================================
 
   // gets the return token values from the Spotify's API
   const getReturnedParamsFromSpotifyAuth = (hash) => {
@@ -39,7 +42,8 @@ function Feed() {
   };
 
   // creates userTopTracks and userTestTracks array to later send them to the python server
-  async function createUserTracks(tracks, access_token, type) {
+  async function createUserTracks(tracks, access_token, type, genre) {
+    // creates ids string for axios request
     let ids = "";
 
     tracks.forEach((element) => {
@@ -48,7 +52,6 @@ function Feed() {
     });
 
     ids = ids.substring(0, ids.length - 1);
-    let audio_features;
 
     // gets tracks audio features
     await axios
@@ -59,28 +62,74 @@ function Feed() {
       })
       .then((response) => {
         // gets audio features from response
-        audio_features = response.data.audio_features;
+        const audio_features = response.data.audio_features;
 
         // creates new track object and adds it to userTopTracks
         for (let i = 0; i < tracks.length; i++) {
-          const track = {
-            id: tracks[i].id,
-            name: tracks[i].name,
-            danceability: audio_features[i].danceability,
-            duration_ms: audio_features[i].duration_ms,
-            energy: audio_features[i].energy,
-            instrumentalness: audio_features[i].instrumentalness,
-            liveness: audio_features[i].liveness,
-            loudness: audio_features[i].loudness,
-            speechiness: audio_features[i].speechiness,
-            tempo: audio_features[i].tempo,
-            time_signature: audio_features[i].time_signature,
-            valence: audio_features[i].valence,
-          };
+          let trackGenre = genre;
 
-          if (type === "top") {
-            setUserTopTracks((userTopTracks) => [...userTopTracks, track]);
-          } else if (type === "test") {
+          // if the genre is "" then it is a top track and we need to find out what its genre is
+          // if it is a test track it already comes in the function call
+          if (trackGenre === "" && type === "top") {
+            axios
+              .get(
+                `https://api.spotify.com/v1/artists?ids=${tracks[i].artists[0].id}`,
+                {
+                  headers: {
+                    Authorization: "Bearer " + access_token,
+                  },
+                }
+              )
+              .then((response2) => {
+                // gets trackGenre
+                trackGenre = response2.data.artists[0].genres[0];
+
+                if (!trackGenre) {
+                  trackGenre = "undefined";
+                }
+
+                // creates track object that adds to the state variable
+                const track = {
+                  id: tracks[i].id,
+                  name: tracks[i].name,
+                  artist: tracks[i].artists[0].name,
+                  danceability: audio_features[i].danceability,
+                  duration_ms: audio_features[i].duration_ms,
+                  energy: audio_features[i].energy,
+                  instrumentalness: audio_features[i].instrumentalness,
+                  liveness: audio_features[i].liveness,
+                  loudness: audio_features[i].loudness,
+                  speechiness: audio_features[i].speechiness,
+                  tempo: audio_features[i].tempo,
+                  time_signature: audio_features[i].time_signature,
+                  valence: audio_features[i].valence,
+                  genre: trackGenre,
+                };
+
+                setUserTopTracks((userTopTracks) => [...userTopTracks, track]);
+              })
+              .catch((error) => {
+                console.log(error);
+              });
+          }
+          if (trackGenre !== "" && type === "test") {
+            // creates track object that adds to the state variable
+            const track = {
+              id: tracks[i].id,
+              name: tracks[i].name,
+              artist: tracks[i].artists[0].name,
+              danceability: audio_features[i].danceability,
+              duration_ms: audio_features[i].duration_ms,
+              energy: audio_features[i].energy,
+              instrumentalness: audio_features[i].instrumentalness,
+              liveness: audio_features[i].liveness,
+              loudness: audio_features[i].loudness,
+              speechiness: audio_features[i].speechiness,
+              tempo: audio_features[i].tempo,
+              time_signature: audio_features[i].time_signature,
+              valence: audio_features[i].valence,
+              genre: trackGenre,
+            };
             setUserTestTracks((userTestTracks) => [...userTestTracks, track]);
           }
         }
@@ -90,28 +139,7 @@ function Feed() {
       });
   }
 
-  // sends request to the server through the click of the button
-  const handleRecommendationsButtonCLick = () => {
-    // sends information to the server
-    axios
-      .post("http://127.0.0.1:5000/", {
-        top_tracks: userTopTracks,
-        test_tracks: userTestTracks,
-      })
-      .then((response) => {
-        setUserRecommendations(response);
-        setResultsFlag(true);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  };
-
-  // sends request to the server through the click of the button
-  const handleLogoutButtonCLick = () => {
-    localStorage.clear();
-    window.location = "/";
-  };
+  // ============================================== useEffect ==============================================
 
   // fetches url tokens on page load
   useEffect(() => {
@@ -156,7 +184,7 @@ function Feed() {
           .then((response) => {
             const artists = response.data.items;
 
-            if(artists.length > 0){
+            if (artists.length > 0) {
               setRecommendationButtonFlag(true);
             }
 
@@ -194,13 +222,14 @@ function Feed() {
             },
           })
           .then((response) => {
-            createUserTracks(response.data.items, access_token, "top");
+            createUserTracks(response.data.items, access_token, "top", "");
             console.log("Got top tracks data!");
           })
           .catch((error) => {
             console.log(error);
           });
 
+        // iterates through the genre array
         genres.forEach((genre) => {
           const USER_SEARCH_ENDPOINT = `https://api.spotify.com/v1/search?q=genre:${genre}+tag:hipster&type=track&limit=50`;
 
@@ -215,7 +244,8 @@ function Feed() {
               createUserTracks(
                 response.data.tracks.items,
                 access_token,
-                "test"
+                "test",
+                genre
               );
               console.log("Got test tracks data from the ", genre, "genre!");
             })
@@ -226,6 +256,33 @@ function Feed() {
       }
     })();
   }, []);
+
+  // ============================================== Handlers ==============================================
+
+  // sends request to the server through the click of the button
+  const handleRecommendationsButtonCLick = () => {
+    // sends information to the server
+    axios
+      .post("http://127.0.0.1:5000/", {
+        top_tracks: userTopTracks,
+        test_tracks: userTestTracks,
+      })
+      .then((response) => {
+        setUserRecommendations(response);
+        setResultsFlag(true);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
+  // sends request to the server through the click of the button
+  const handleLogoutButtonCLick = () => {
+    localStorage.clear();
+    window.location = "/";
+  };
+
+  // ============================================== Renders ==============================================
 
   const renderLogoutButton = () => {
     return <button onClick={() => handleLogoutButtonCLick()}>Logout</button>;
@@ -282,13 +339,20 @@ function Feed() {
     if (resultsFlag) {
       return (
         <div>
-          <Results state={userRecommendations} />
+          <div>
+            <CreatePlaylistButton state={userData} songs={userRecommendations} />
+          </div>
+          <div>
+            <Results state={userRecommendations} />
+          </div>
         </div>
       );
     } else {
       return <></>;
     }
   };
+
+  // ============================================== return ==============================================
 
   return (
     <div>

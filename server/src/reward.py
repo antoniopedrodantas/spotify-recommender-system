@@ -5,3 +5,4 @@ class Reward:
     liveness = 0
     speechiness = 0
     valence = 0
+

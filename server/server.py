@@ -1,3 +1,4 @@
+from cgi import test
 import json
 from flask import Flask, request, jsonify
 from flask_cors import CORS
@@ -43,20 +44,12 @@ def recommendation_generator():
     test_tracks_data = request_data["test_tracks"]
 
     # creates reward function and updates it according to the user's top tracks
-    reward_function = Reward()
+    reward_function_params = Reward()
+    reward_function = {"undefined": reward_function_params}
     update_reward_function(reward_function, top_tracks_data)
 
     # gets the max distance from reward score that tells if a song is going to be liked or not
     policy_limit = get_policy_limit(reward_function, top_tracks_data)
-
-    print("Here are the perfect song parameter values as the reward function:")
-    print(" danceability: ", reward_function.danceability)
-    print(" energy: ", reward_function.energy)
-    print(" instrumentalness: ", reward_function.instrumentalness)
-    print(" liveness: ", reward_function.liveness)
-    # print(" loudness: ", reward_function.loudness)
-    print(" speechiness: ", reward_function.speechiness)
-    print(" valence: ", reward_function.valence)
 
     print("\n")
 
@@ -64,7 +57,7 @@ def recommendation_generator():
 
     print("\n")
 
-    print("The policy limit to which a song is considered good or not: ", policy_limit)
+    print("The policy limit let's us know if a song is considered good or not")
     print("This is the track from the song set that has the highest difference, therefore every new song it is analysed that surpasses this value is considered to be not good.")
     print("The lower the reward value, the more the user is likeky going to like it.")
 
@@ -72,8 +65,15 @@ def recommendation_generator():
 
     response = []
     for track in test_tracks_results:
-        item = [track.id, track.name, track.score]
-        if item not in response:
+        item = [track.id, track.name, track.artist, track.score]
+        # it only recommends one track by artist
+        can_add = 0
+        for track_cmp in response:
+            if item[2] == track_cmp[2]:
+                can_add = 1
+        
+        # if the artist is not already in the response, it adds to it
+        if can_add == 0:
             response.append(item)
 
     return jsonify(response)
