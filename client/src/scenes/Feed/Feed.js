@@ -20,7 +20,7 @@ function Feed() {
 
   // flag tell if its ok to show the spotify results
   const [userSpotifyRecommendations, setUserSpotifyRecommendations] = useState(
-    {}
+    []
   );
   const [spotifyResultsFlag, setSpotifyResultsFlag] = useState(false);
 
@@ -165,6 +165,13 @@ function Feed() {
         localStorage.setItem("tokenType", token_type);
         localStorage.setItem("expiresIn", expires_in);
 
+        // clears useStates
+        setUserData({});
+        setUserTopArtists([]);
+        setUserTopTracks([]);
+        setUserTestTracks([]);
+        setUserSpotifyRecommendations([]);
+
         // gets user's info
         await axios
           .get(USER_INFO_ENDPOINT, {
@@ -232,7 +239,49 @@ function Feed() {
           })
           .then((response) => {
             createUserTracks(response.data.items, access_token, "top", "");
-            console.log("Got top tracks data!");
+
+            // get spotify recommendations
+            let spotifyRecommendations = [];
+            response.data.items.forEach((track) => {
+              axios
+                .get(
+                  `https://api.spotify.com/v1/recommendations?seed_tracks=${track.id}`,
+                  {
+                    headers: {
+                      Authorization:
+                        "Bearer " + localStorage.getItem("accessToken"),
+                    },
+                  }
+                )
+                .then((response) => {
+                  const results = response.data.tracks;
+
+                  // gets the first two song recommendations for every track in userTopTracks
+                  if (results[0]) {
+                    const first_song = [
+                      results[0].id,
+                      results[0].name,
+                      results[0].artists[0].name,
+                      0,
+                    ];
+                    spotifyRecommendations.push(first_song);
+                  }
+
+                  if (results[1]) {
+                    const second_song = [
+                      results[1].id,
+                      results[1].name,
+                      results[1].artists[0].name,
+                      0,
+                    ];
+                    spotifyRecommendations.push(second_song);
+                  }
+                })
+                .catch((error) => {
+                  console.log(error);
+                });
+            });
+            setUserSpotifyRecommendations(spotifyRecommendations);
           })
           .catch((error) => {
             console.log(error);
@@ -292,23 +341,9 @@ function Feed() {
   };
 
   const handleSpotifyRecommendationsButtonCLick = () => {
-    userTopTracks.forEach((track) => {
-      axios
-        .get(
-          `https://api.spotify.com/v1/recommendations?seed_tracks=${track.id}`,
-          {
-            headers: {
-              Authorization: "Bearer " + localStorage.getItem("accessToken"),
-            },
-          }
-        )
-        .then((response) => {
-          console.log(response);
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-    });
+    if (userSpotifyRecommendations.length >= 0) {
+      setSpotifyResultsFlag(true);
+    }
   };
 
   // ============================================== Renders ==============================================
@@ -370,7 +405,8 @@ function Feed() {
         <div>
           <div>
             <CreatePlaylistButton
-              state={userData}
+              state="irl"
+              user={userData}
               songs={userRecommendations}
             />
           </div>
@@ -407,7 +443,29 @@ function Feed() {
     }
   };
 
-  const renderSpotifyRecommendationsResults = () => {};
+  const renderSpotifyRecommendationsResults = () => {
+    if (spotifyResultsFlag) {
+      const info = {
+        data: userSpotifyRecommendations,
+      };
+      return (
+        <div>
+          <div>
+            <CreatePlaylistButton
+              state="spotify"
+              user={userData}
+              songs={info}
+            />
+          </div>
+          <div>
+            <Results state={info} />
+          </div>
+        </div>
+      );
+    } else {
+      return <></>;
+    }
+  };
 
   // ============================================== return ==============================================
 
