@@ -5,6 +5,9 @@ import axios from "axios";
 import Results from "../../components/Results/Results";
 import CreatePlaylistButton from "../../components/CreatePlaylistButton/CreatePlaylistButton";
 
+// Styling
+import "./Feed.css";
+
 function Feed() {
   // user data state variable
   const [userData, setUserData] = useState({});
@@ -285,7 +288,36 @@ function Feed() {
   // ============================================== Renders ==============================================
 
   const renderLogoutButton = () => {
-    return <button onClick={() => handleLogoutButtonCLick()}>Logout</button>;
+    return (
+      <div className="logout-button-container">
+        <button
+          className="logout-button"
+          onClick={() => handleLogoutButtonCLick()}
+        >
+          LOGOUT
+        </button>
+      </div>
+    );
+  };
+
+  const renderUserCard = () => {
+    if (!userData.images) {
+      return <></>;
+    } else {
+      return (
+        <div className="user-card-container">
+          <div className="user-picture">
+            <img
+              alt="profile picture"
+              className="profile-pic"
+              src={userData.images[0].url}
+            />
+          </div>
+          <div className="display-name">{userData.id}</div>
+          <div>{userData.followers.total} followers</div>
+        </div>
+      );
+    }
   };
 
   // renders recommendation button after all useStates are filled up
@@ -340,7 +372,10 @@ function Feed() {
       return (
         <div>
           <div>
-            <CreatePlaylistButton state={userData} songs={userRecommendations} />
+            <CreatePlaylistButton
+              state={userData}
+              songs={userRecommendations}
+            />
           </div>
           <div>
             <Results state={userRecommendations} />
@@ -356,16 +391,23 @@ function Feed() {
 
   return (
     <div>
-      {renderLogoutButton()}
-      <p>
-        Hello, {userData.display_name}. Welcome to our Spotify recommendation
-        system.
-      </p>
-      <br></br>
-      {renderTopArtists()}
-      <br></br>
+      <div className="navbar">
+        <div className="text-top">INVERSE REINFORCEMENT LEARNING</div>
+        {renderLogoutButton()}
+      </div>
+      <div className="webpage-container">
+        <div className="instruction-text">
+          WELCOME, {userData.display_name}. THE INVERSE REINFORCEMENT LEARNING
+          RECOMMENDER SYSTEM ALLOWS YOU TO GENERATE MUSIC RECOMMENDATIONS THAT
+          WERE ATTRIBUTED TO YOU. IT USES IRL TO TEST ITS SUCCESS ON INFERRING
+          USER PREFERENCES. YOU CAN CHECK OUT YOUR RECOMMENDATIONS RIGHT HERE OR
+          IMPORT THEM TO A PLAYLIST ON YPUR SPOTIFY ACCOUNT.
+        </div>
+        {renderUserCard()}
+      </div>
+      {/* {renderTopArtists()}
       {renderRecommendationsButton()}
-      {renderRecommendationsResults()}
+      {renderRecommendationsResults()} */}
     </div>
   );
 }
