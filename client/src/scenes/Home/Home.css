@@ -48,7 +48,7 @@ body {
 /* LOGIN BUTTON */
 
 .button-wrapper {
-  margin-top: 4rem;
+  margin-top: 6rem;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -76,3 +76,33 @@ body {
   cursor: pointer;
   transform: scale(1.15);
 }
+
+/* FOOTER */
+
+.footer-container {
+  font-size: small;
+  margin-top: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon-links-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+.icon-link {
+  margin: 1rem;
+  color: var(--contrast-color);
+  /* transition */
+  transition: all 0.2s ease;
+  transform: scale(1);
+}
+
+.icon-link:hover {
+  cursor: pointer;
+  transform: scale(1.15);
+}
+

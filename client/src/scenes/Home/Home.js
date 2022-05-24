@@ -2,7 +2,7 @@
 import "./Home.css";
 
 // Icons
-import { SiSpotify } from "react-icons/si";
+import { SiSpotify, SiGithub, SiLinkedin } from "react-icons/si";
 
 // to use environment variables
 // process.env.REACT_APP_...
@@ -49,6 +49,19 @@ function Home() {
       <div className="button-wrapper">
         <div className="login-button" onClick={() => handleLoginButtonCLick()}>
           LOGIN WITH SPOTIFY
+        </div>
+      </div>
+      <div className="footer-container">
+        <div>
+          Project developed by António Pedro Dantas, Computer Science @ FEUP
+        </div>
+        <div className="icon-links-grid">
+          <a href="https://github.com/antoniopedrodantas">
+            <SiGithub className="icon-link" size={18} />
+          </a>
+          <a href="https://linkedin.com/in/antoniopedrodantas">
+            <SiLinkedin className="icon-link" size={18} />
+          </a>
         </div>
       </div>
     </div>
