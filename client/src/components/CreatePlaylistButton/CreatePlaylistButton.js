@@ -6,12 +6,14 @@ function CreatePlaylistButton(props) {
   // ============================================== Handlers ==============================================
 
   async function handleCreatePlaylistButtonCLick() {
+    // creates playlist's name based on the type of recommendations
+    const playlistName = `${props.state}_recommendations`
     // creates playlist
     axios
       .post(
-        `https://api.spotify.com/v1/users/${props.state.id}/playlists`,
+        `https://api.spotify.com/v1/users/${props.user.id}/playlists`,
         {
-          name: `${props.state.display_name}_recommendations_irl`,
+          name: playlistName,
           public: false,
         },
         {
@@ -21,14 +23,16 @@ function CreatePlaylistButton(props) {
         }
       )
       .then((response) => {
-        console.log(response);
 
+        // starts filling up the playlist with the recommended songs
         let tracks = props.songs.data;
         let ids = [];
 
         for (let i = 0; i < 100; i++) {
-          //   ids += "spotify:track:" + tracks[i][0] + ",";
-          ids.push("spotify:track:" + tracks[i][0]);
+          // checks that it is not undefined
+          if(tracks[i]){
+            ids.push("spotify:track:" + tracks[i][0]);
+          }
         }
 
         // adds songs to the playlist
@@ -44,8 +48,8 @@ function CreatePlaylistButton(props) {
               },
             }
           )
-          .then((response2) => {
-            console.log(response2);
+          .then(() => {
+            console.log(`${playlistName} created succesfully!`);
           })
           .catch((error2) => {
             console.log(error2);

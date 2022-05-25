@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 
 import axios from "axios";
 
+import "./Feed.css";
+
 import Results from "../../components/Results/Results";
 import CreatePlaylistButton from "../../components/CreatePlaylistButton/CreatePlaylistButton";
 
@@ -17,8 +19,15 @@ function Feed() {
 
   // holds values of server side response
   const [userRecommendations, setUserRecommendations] = useState({});
-  // flags tell if its ok to show the results component and the "Get Recommendations" button
   const [resultsFlag, setResultsFlag] = useState(false);
+
+  // flag tell if its ok to show the spotify results
+  const [userSpotifyRecommendations, setUserSpotifyRecommendations] = useState(
+    []
+  );
+  const [spotifyResultsFlag, setSpotifyResultsFlag] = useState(false);
+
+  // flags tell if its ok to show the results component and the "Get Recommendations" button
   const [recommendationButtonFlag, setRecommendationButtonFlag] =
     useState(false);
 
@@ -159,6 +168,13 @@ function Feed() {
         localStorage.setItem("tokenType", token_type);
         localStorage.setItem("expiresIn", expires_in);
 
+        // clears useStates
+        setUserData({});
+        setUserTopArtists([]);
+        setUserTopTracks([]);
+        setUserTestTracks([]);
+        setUserSpotifyRecommendations([]);
+
         // gets user's info
         await axios
           .get(USER_INFO_ENDPOINT, {
@@ -226,7 +242,49 @@ function Feed() {
           })
           .then((response) => {
             createUserTracks(response.data.items, access_token, "top", "");
-            console.log("Got top tracks data!");
+
+            // get spotify recommendations
+            let spotifyRecommendations = [];
+            response.data.items.forEach((track) => {
+              axios
+                .get(
+                  `https://api.spotify.com/v1/recommendations?seed_tracks=${track.id}`,
+                  {
+                    headers: {
+                      Authorization:
+                        "Bearer " + localStorage.getItem("accessToken"),
+                    },
+                  }
+                )
+                .then((response) => {
+                  const results = response.data.tracks;
+
+                  // gets the first two song recommendations for every track in userTopTracks
+                  if (results[0]) {
+                    const first_song = [
+                      results[0].id,
+                      results[0].name,
+                      results[0].artists[0].name,
+                      0,
+                    ];
+                    spotifyRecommendations.push(first_song);
+                  }
+
+                  if (results[1]) {
+                    const second_song = [
+                      results[1].id,
+                      results[1].name,
+                      results[1].artists[0].name,
+                      0,
+                    ];
+                    spotifyRecommendations.push(second_song);
+                  }
+                })
+                .catch((error) => {
+                  console.log(error);
+                });
+            });
+            setUserSpotifyRecommendations(spotifyRecommendations);
           })
           .catch((error) => {
             console.log(error);
@@ -263,6 +321,12 @@ function Feed() {
   // ============================================== Handlers ==============================================
 
   // sends request to the server through the click of the button
+  const handleLogoutButtonCLick = () => {
+    localStorage.clear();
+    window.location = "/";
+  };
+
+  // sends request to the server through the click of the button
   const handleRecommendationsButtonCLick = () => {
     // sends information to the server
     axios
@@ -279,10 +343,10 @@ function Feed() {
       });
   };
 
-  // sends request to the server through the click of the button
-  const handleLogoutButtonCLick = () => {
-    localStorage.clear();
-    window.location = "/";
+  const handleSpotifyRecommendationsButtonCLick = () => {
+    if (userSpotifyRecommendations.length >= 0) {
+      setSpotifyResultsFlag(true);
+    }
   };
 
   // ============================================== Renders ==============================================
@@ -320,6 +384,29 @@ function Feed() {
     }
   };
 
+  const renderTopArtists = () => {
+    if (!recommendationButtonFlag) {
+      return (
+        <p>
+          We're sorry. There isn't enough information to create recommendtions
+          for you. You need to listen to some more music.
+        </p>
+      );
+    } else {
+      let artists = "";
+      userTopArtists.forEach((artist) => {
+        artists = artists + ", " + artist.name;
+      });
+      artists = artists + ".";
+      return (
+        <div>
+          <p>We can already see you're a big fan of:</p>
+          <p>{artists}</p>
+        </div>
+      );
+    }
+  };
+
   // renders recommendation button after all useStates are filled up
   const renderRecommendationsButton = () => {
     if (
@@ -344,41 +431,66 @@ function Feed() {
     }
   };
 
-  const renderTopArtists = () => {
-    if (!recommendationButtonFlag) {
-      return (
-        <p>
-          We're sorry. There isn't enough information to create recommendtions
-          for you. You need to listen to some more music.
-        </p>
-      );
-    } else {
-      let artists = "";
-      userTopArtists.forEach((artist) => {
-        artists = artists + ", " + artist.name;
-      });
-      artists = artists + ".";
-      return (
-        <div>
-          <p>We can already see you're a big fan of:</p>
-          <p>{artists}</p>
-        </div>
-      );
-    }
-  };
-
   const renderRecommendationsResults = () => {
     if (resultsFlag) {
       return (
         <div>
           <div>
             <CreatePlaylistButton
-              state={userData}
+              state="irl"
+              user={userData}
               songs={userRecommendations}
             />
           </div>
           <div>
             <Results state={userRecommendations} />
+          </div>
+        </div>
+      );
+    } else {
+      return <></>;
+    }
+  };
+
+  const renderSpotifyRecommendationsButton = () => {
+    if (
+      userTopTracks.length >= 0 &&
+      userTestTracks.length >= 0 &&
+      spotifyResultsFlag === false &&
+      recommendationButtonFlag === true
+    ) {
+      return (
+        <div>
+          <p>
+            Do you want to get new song recommendations based on an already
+            existing Spotify algorithm? Click below.
+          </p>
+          <button onClick={() => handleSpotifyRecommendationsButtonCLick()}>
+            Get recommendations
+          </button>
+        </div>
+      );
+    } else {
+      return <></>;
+    }
+  };
+
+  const renderSpotifyRecommendationsResults = () => {
+    if (spotifyResultsFlag) {
+      const info = {
+        data: userSpotifyRecommendations,
+      };
+      return (
+        <div>
+          <div>
+            <CreatePlaylistButton
+              state="spotify"
+              user={userData}
+              songs={info}
+            />
+          </div>
+          <div>
+            <Results state={info} />
           </div>
         </div>
       );
