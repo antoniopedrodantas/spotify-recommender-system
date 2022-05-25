@@ -2,6 +2,9 @@ import React from "react";
 
 import axios from "axios";
 
+// Styling
+import "./CreatePlaylistButton.css"
+
 function CreatePlaylistButton(props) {
   // ============================================== Handlers ==============================================
 
@@ -65,9 +68,9 @@ function CreatePlaylistButton(props) {
   return (
     <>
       <div>
-        <button onClick={() => handleCreatePlaylistButtonCLick()}>
-          Create Playlist
-        </button>
+        <div className="create-playlist-button"onClick={() => handleCreatePlaylistButtonCLick()}>
+          CREATE PLAYLIST
+        </div>
       </div>
     </>
   );

@@ -213,6 +213,7 @@ function Feed() {
                 name: element.name,
                 genres: element.genres,
                 popularity: element.popularity,
+                image: element.images[0],
               };
               setUserTopArtists((userTopArtists) => [
                 ...userTopArtists,
@@ -384,28 +385,18 @@ function Feed() {
     }
   };
 
-  const renderTopArtists = () => {
-    if (!recommendationButtonFlag) {
-      return (
-        <p>
-          We're sorry. There isn't enough information to create recommendtions
-          for you. You need to listen to some more music.
-        </p>
-      );
-    } else {
-      let artists = "";
-      userTopArtists.forEach((artist) => {
-        artists = artists + ", " + artist.name;
-      });
-      artists = artists + ".";
-      return (
-        <div>
-          <p>We can already see you're a big fan of:</p>
-          <p>{artists}</p>
-        </div>
-      );
-    }
-  };
+  // const renderTopArtists = () => {
+  //   if (!recommendationButtonFlag) {
+  //     return (
+  //       <p>
+  //         We're sorry. There isn't enough information to create recommendtions
+  //         for you. You need to listen to some more music.
+  //       </p>
+  //     );
+  //   } else {
+  //     return <ArtistsComponent artists={userTopArtists} />;
+  //   }
+  // };
 
   // renders recommendation button after all useStates are filled up
   const renderRecommendationsButton = () => {
@@ -416,14 +407,13 @@ function Feed() {
       recommendationButtonFlag === true
     ) {
       return (
-        <div>
-          <p>
-            Do you want to get new song recommendations based on an IRL
-            approach? Click below.
-          </p>
-          <button onClick={() => handleRecommendationsButtonCLick()}>
-            Get recommendations
-          </button>
+        <div className="recommendations-wrapper webpage-item">
+          <div
+            className="recommendations-button"
+            onClick={() => handleRecommendationsButtonCLick()}
+          >
+            GET RECOMMENDATIONS
+          </div>
         </div>
       );
     } else {
@@ -434,17 +424,15 @@ function Feed() {
   const renderRecommendationsResults = () => {
     if (resultsFlag) {
       return (
-        <div>
-          <div>
+        <div className="recommendations-wrapper webpage-item recommendations-container">
+          <div className="create-playlist-wrapper">
             <CreatePlaylistButton
               state="irl"
               user={userData}
               songs={userRecommendations}
             />
           </div>
-          <div>
-            <Results state={userRecommendations} />
-          </div>
+          <Results state={userRecommendations} />
         </div>
       );
     } else {
@@ -502,24 +490,27 @@ function Feed() {
   // ============================================== return ==============================================
 
   return (
+    // Add webpage that says there isn't enough information to create recommendations
     <div>
       <div className="navbar">
         <div className="text-top">INVERSE REINFORCEMENT LEARNING</div>
         {renderLogoutButton()}
       </div>
       <div className="webpage-container">
-        <div className="instruction-text">
+        <div className="instruction-text webpage-item">
           WELCOME, {userData.display_name}. THE INVERSE REINFORCEMENT LEARNING
           RECOMMENDER SYSTEM ALLOWS YOU TO GENERATE MUSIC RECOMMENDATIONS THAT
           WERE ATTRIBUTED TO YOU. IT USES IRL TO TEST ITS SUCCESS ON INFERRING
           USER PREFERENCES. YOU CAN CHECK OUT YOUR RECOMMENDATIONS RIGHT HERE OR
-          IMPORT THEM TO A PLAYLIST ON YPUR SPOTIFY ACCOUNT.
+          IMPORT THEM TO A PLAYLIST ON YOUR SPOTIFY ACCOUNT.
         </div>
-        {renderUserCard()}
+        {/* {renderUserCard()} */}
+        {/* {renderTopArtists()} */}
+        {renderRecommendationsButton()}
+        {renderRecommendationsResults()}
       </div>
-      {/* {renderTopArtists()}
-      {renderRecommendationsButton()}
-      {renderRecommendationsResults()} */}
+      {/* ADD button to create two playlists and redirect to a new page with the form link and instructions */}
+      {/* <div>WANT TO HELP US ENHANCE OUR ALGORITHM?</div> */}
     </div>
   );
 }

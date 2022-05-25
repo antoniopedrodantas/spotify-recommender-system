@@ -50,8 +50,12 @@
 
 .webpage-container {
   display: grid;
-  grid-template-columns: 1fr 3fr;
+  grid-template-columns: 1fr;
   margin: 1rem;
+}
+
+.webpage-item {
+  padding: 1rem;
 }
 
 .instruction-text {
@@ -59,7 +63,8 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: top;
+  justify-content: center;
+  text-align: center;
 }
 
 /* USER CARD */
@@ -93,4 +98,51 @@
 
 .display-name {
   margin-top: 1rem;
+}
+
+/* RECOMMENDATIONS */
+
+.recommendations-wrapper {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.recommendations-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  background-color: var(--contrast-color);
+  width: 400px;
+  text-align: center;
+  height: 50px;
+  border: var(--contrast-color);
+  border-radius: 60px;
+  color: var(--text-color);
+  font-weight: bold;
+  /* transition */
+  transition: all 0.5s ease;
+  transform: scale(1);
+}
+
+.recommendations-button:hover {
+  cursor: pointer;
+  transform: scale(1.1);
+}
+
+.recommendations-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  height: 500px;
+  overflow-y: auto;
+}
+
+.create-playlist-wrapper {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }

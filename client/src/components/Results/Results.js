@@ -2,6 +2,9 @@ import React, { useEffect, useState } from "react";
 
 import axios from "axios";
 
+// Styling
+import "./Results.css";
+
 function Results(props) {
   const [response, setResponse] = useState([]);
   const [results, setResults] = useState([]);
@@ -83,19 +86,15 @@ function Results(props) {
 
   const renderResults = () => {
     return (
-      <div>
+      <>
         {results.map((elem) => (
-          <div key={elem.id}>
+          <div className="result-wrapper" key={elem.id}>
+            <img src={elem.album.images[2].url} alt="album_cover" />
             <a href={elem.uri}>{elem.name}</a>
             <p>{elem.artists[0].name}</p>
-            <img src={elem.album.images[2].url} alt="album_cover" />
-            <br></br>
-            <br></br>
-            <br></br>
-            <br></br>
           </div>
         ))}
-      </div>
+      </>
     );
   };
 
@@ -115,7 +114,7 @@ function Results(props) {
 
   return (
     <>
-      <div>{renderResults()}</div>
+      {renderResults()}
       <div>{renderLoadContentButton()}</div>
     </>
   );

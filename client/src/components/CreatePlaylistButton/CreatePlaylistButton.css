@@ -1,0 +1,22 @@
+.create-playlist-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    background-color: var(--contrast-color);
+    width: 200px;
+    text-align: center;
+    height: 50px;
+    border: var(--contrast-color);
+    border-radius: 60px;
+    color: var(--text-color);
+    font-weight: bold;
+    /* transition */
+    transition: all 0.5s ease;
+    transform: scale(1);
+  }
+  
+  .create-playlist-button:hover {
+    cursor: pointer;
+    transform: scale(1.1);
+  }
