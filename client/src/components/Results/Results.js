@@ -111,9 +111,9 @@ function Results(props) {
       return <p>We're sorry, there are no more recommendations for you.</p>;
     } else {
       return (
-        <button onClick={() => handleLoadContentButtonCLick()}>
-          Load more content
-        </button>
+        <div className="more-content-button" onClick={() => handleLoadContentButtonCLick()}>
+          LOAD MORE CONTENT
+        </div>
       );
     }
   };

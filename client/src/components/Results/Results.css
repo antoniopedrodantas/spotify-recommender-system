@@ -22,7 +22,7 @@
   align-items: flex-start;
   text-overflow: ellipsis;
   margin: 1rem;
-  text-overflow: ellipsis; 
+  text-overflow: ellipsis;
 }
 
 .result-text {
@@ -36,4 +36,29 @@
 .result-song {
   width: 150px;
   text-overflow: ellipsis;
+}
+
+/* MORE CONTENT */
+
+.more-content-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  background-color: var(--contrast-color);
+  width: 250px;
+  text-align: center;
+  height: 50px;
+  border: var(--contrast-color);
+  border-radius: 60px;
+  color: var(--text-color);
+  font-weight: bold;
+  /* transition */
+  transition: all 0.5s ease;
+  transform: scale(1);
+}
+
+.more-content-button:hover {
+  cursor: pointer;
+  transform: scale(1.1);
 }

@@ -458,7 +458,7 @@ function Feed() {
 
     setTimeout(() => {
       // redirects the user to a new webpage
-      window.location = "/experiment";
+      window.location = `/experiment#access_token=${localStorage.getItem("accessToken")}`;
     }, 500);
   }
 
@@ -512,6 +512,18 @@ function Feed() {
 
   // renders recommendation button after all useStates are filled up
   const renderRecommendationsButton = () => {
+    if (!recommendationButtonFlag) {
+      return (
+        <div className="instruction-text lack-info">
+          <p>
+          We're sorry. There isn't enough information to create recommendations
+          for you. You need to listen to some more music.
+          </p>
+          <p>😢</p>
+        </div>
+      );
+    }
+
     if (
       userTopTracks.length >= 0 &&
       userTestTracks.length >= 0 &&

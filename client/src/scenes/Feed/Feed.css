@@ -67,6 +67,10 @@
   text-align: center;
 }
 
+.lack-info {
+  margin-top: 2rem;
+}
+
 /* USER CARD */
 
 .user-card-container {
