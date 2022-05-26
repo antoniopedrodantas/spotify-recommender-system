@@ -136,7 +136,7 @@
 .recommendations-container {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr 1fr;
-  height: 500px;
+  height: 400px;
   overflow-y: auto;
 }
 
@@ -145,4 +145,30 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
+}
+
+/* EXPERIMENTS */
+
+.experiments-div {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin-top: 4rem;
+  /* transition */
+  transition: all 0.5s ease;
+  transform: scale(1);
+}
+
+.experiments-div:hover {
+  cursor: pointer;
+  transform: scale(1.1);
+}
+
+.text-link {
+  font-weight: bold;
+}
+
+.text-miniscule {
+  font-size: x-small;
 }

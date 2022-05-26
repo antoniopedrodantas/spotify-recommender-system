@@ -89,9 +89,17 @@ function Results(props) {
       <>
         {results.map((elem) => (
           <div className="result-wrapper" key={elem.id}>
-            <img src={elem.album.images[2].url} alt="album_cover" />
-            <a href={elem.uri}>{elem.name}</a>
-            <p>{elem.artists[0].name}</p>
+            <div className="result-cover">
+              <img className="album-pic" src={elem.album.images[2].url} alt="album_cover" />
+            </div>
+            <div className="result-song-artist">
+              <div className="result-text">
+                <a className="result-song" href={elem.uri}>{elem.name}</a>
+              </div>
+              <div className="result-text">
+                <p className="result-artist">{elem.artists[0].name}</p>
+              </div>
+            </div>
           </div>
         ))}
       </>

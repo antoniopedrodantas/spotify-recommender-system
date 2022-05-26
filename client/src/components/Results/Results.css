@@ -1,8 +1,39 @@
 .result-wrapper {
   width: 100%;
+  display: grid;
+  grid-template-columns: 1fr 3fr;
+}
+
+.result-cover {
+  width: 100%;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  padding: 1rem;
+}
+
+.result-song-artist {
+  /* width: 100%;
+  display: grid;
+  grid-template-rows: 1fr 1fr; */
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  text-overflow: ellipsis;
+  margin: 1rem;
+  text-overflow: ellipsis; 
+}
+
+.result-text {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  text-overflow: ellipsis;
+}
+
+.result-song {
+  width: 150px;
+  text-overflow: ellipsis;
 }

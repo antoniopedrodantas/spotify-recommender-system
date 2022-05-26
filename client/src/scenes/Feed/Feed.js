@@ -350,6 +350,113 @@ function Feed() {
     }
   };
 
+  const handleExperimentsButton = () => {
+    // creates irl_recommenndations playlist
+    axios
+      .post(
+        `https://api.spotify.com/v1/users/${userData.id}/playlists`,
+        {
+          name: "irl_recommendations",
+          public: false,
+        },
+        {
+          headers: {
+            Authorization: "Bearer " + localStorage.getItem("accessToken"),
+          },
+        }
+      )
+      .then((response) => {
+        // starts filling up the playlist with the recommended songs
+        let tracks = userRecommendations.data;
+        let ids = [];
+
+        for (let i = 0; i < 25; i++) {
+          // checks that it is not undefined
+          if (tracks[i]) {
+            ids.push("spotify:track:" + tracks[i][0]);
+          }
+        }
+
+        // adds songs to the playlist
+        axios
+          .post(
+            `https://api.spotify.com/v1/playlists/${response.data.id}/tracks`,
+            {
+              uris: ids,
+            },
+            {
+              headers: {
+                Authorization: "Bearer " + localStorage.getItem("accessToken"),
+              },
+            }
+          )
+          .then(() => {
+            console.log(`irl_recommendations playlist created succesfully!`);
+          })
+          .catch((error2) => {
+            console.log(error2);
+          });
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+
+    // creates spotify recommendations playlist
+    const info = {
+      data: userSpotifyRecommendations,
+    };
+    axios
+      .post(
+        `https://api.spotify.com/v1/users/${userData.id}/playlists`,
+        {
+          name: "spotify_recommendations",
+          public: false,
+        },
+        {
+          headers: {
+            Authorization: "Bearer " + localStorage.getItem("accessToken"),
+          },
+        }
+      )
+      .then((response) => {
+        // starts filling up the playlist with the recommended songs
+        let tracks = info.data;
+        let ids = [];
+
+        for (let i = 0; i < 25; i++) {
+          // checks that it is not undefined
+          if (tracks[i]) {
+            ids.push("spotify:track:" + tracks[i][0]);
+          }
+        }
+
+        // adds songs to the playlist
+        axios
+          .post(
+            `https://api.spotify.com/v1/playlists/${response.data.id}/tracks`,
+            {
+              uris: ids,
+            },
+            {
+              headers: {
+                Authorization: "Bearer " + localStorage.getItem("accessToken"),
+              },
+            }
+          )
+          .then(() => {
+            console.log(
+              `spotify_recommendations playlist created succesfully!`
+            );
+          })
+          .catch((error2) => {
+            console.log(error2);
+          });
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
   // ============================================== Renders ==============================================
 
   const renderLogoutButton = () => {
@@ -487,6 +594,27 @@ function Feed() {
     }
   };
 
+  const renderExperimentsDiv = () => {
+    if (resultsFlag) {
+      return (
+        <div
+          className="experiments-div"
+          onClick={() => handleExperimentsButton()}
+        >
+          <div className="text-link">
+            WANT TO HELP US ENHANCE OUR ALGORITHM?
+          </div>
+          <div className="text-miniscule">
+            THIS IMPLIES LISTENING TO TWO DIFFERENT SUGGESTION PLAYLISTS AND
+            ANSWERING A SMALL SURVEY
+          </div>
+        </div>
+      );
+    } else {
+      return <></>;
+    }
+  };
+
   // ============================================== return ==============================================
 
   return (
@@ -504,13 +632,10 @@ function Feed() {
           USER PREFERENCES. YOU CAN CHECK OUT YOUR RECOMMENDATIONS RIGHT HERE OR
           IMPORT THEM TO A PLAYLIST ON YOUR SPOTIFY ACCOUNT.
         </div>
-        {/* {renderUserCard()} */}
-        {/* {renderTopArtists()} */}
         {renderRecommendationsButton()}
         {renderRecommendationsResults()}
+        {renderExperimentsDiv()}
       </div>
-      {/* ADD button to create two playlists and redirect to a new page with the form link and instructions */}
-      {/* <div>WANT TO HELP US ENHANCE OUR ALGORITHM?</div> */}
     </div>
   );
 }
