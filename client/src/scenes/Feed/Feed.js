@@ -350,9 +350,9 @@ function Feed() {
     }
   };
 
-  const handleExperimentsButton = () => {
+  async function handleExperimentsButton() {
     // creates irl_recommenndations playlist
-    axios
+    await axios
       .post(
         `https://api.spotify.com/v1/users/${userData.id}/playlists`,
         {
@@ -405,7 +405,7 @@ function Feed() {
     const info = {
       data: userSpotifyRecommendations,
     };
-    axios
+    await axios
       .post(
         `https://api.spotify.com/v1/users/${userData.id}/playlists`,
         {
@@ -455,7 +455,12 @@ function Feed() {
       .catch((error) => {
         console.log(error);
       });
-  };
+
+    setTimeout(() => {
+      // redirects the user to a new webpage
+      window.location = "/experiment";
+    }, 500);
+  }
 
   // ============================================== Renders ==============================================
 
