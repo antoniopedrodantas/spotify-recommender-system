@@ -13,7 +13,6 @@ import "./Feed.css";
 function Feed() {
   // user data state variable
   const [userData, setUserData] = useState({});
-  const [userTopArtists, setUserTopArtists] = useState([]);
   const [userTopTracks, setUserTopTracks] = useState([]);
   const [userTestTracks, setUserTestTracks] = useState([]);
 
@@ -25,7 +24,6 @@ function Feed() {
   const [userSpotifyRecommendations, setUserSpotifyRecommendations] = useState(
     []
   );
-  const [spotifyResultsFlag, setSpotifyResultsFlag] = useState(false);
 
   // flags tell if its ok to show the results component and the "Get Recommendations" button
   const [recommendationButtonFlag, setRecommendationButtonFlag] =
@@ -170,7 +168,6 @@ function Feed() {
 
         // clears useStates
         setUserData({});
-        setUserTopArtists([]);
         setUserTopTracks([]);
         setUserTestTracks([]);
         setUserSpotifyRecommendations([]);
@@ -208,18 +205,6 @@ function Feed() {
             }
 
             artists.forEach((element) => {
-              const artist = {
-                id: element.id,
-                name: element.name,
-                genres: element.genres,
-                popularity: element.popularity,
-                image: element.images[0],
-              };
-              setUserTopArtists((userTopArtists) => [
-                ...userTopArtists,
-                artist,
-              ]);
-
               // adds to genres array the genre of each artist he is into
               if (element.genres[0] !== undefined) {
                 const newGenre = element.genres[0].replaceAll(" ", "_");
@@ -344,12 +329,6 @@ function Feed() {
       });
   };
 
-  const handleSpotifyRecommendationsButtonCLick = () => {
-    if (userSpotifyRecommendations.length >= 0) {
-      setSpotifyResultsFlag(true);
-    }
-  };
-
   async function handleExperimentsButton() {
     // creates irl_recommenndations playlist
     await axios
@@ -458,7 +437,9 @@ function Feed() {
 
     setTimeout(() => {
       // redirects the user to a new webpage
-      window.location = `/experiment#access_token=${localStorage.getItem("accessToken")}`;
+      window.location = `/experiment#access_token=${localStorage.getItem(
+        "accessToken"
+      )}`;
     }, 500);
   }
 
@@ -477,47 +458,14 @@ function Feed() {
     );
   };
 
-  const renderUserCard = () => {
-    if (!userData.images) {
-      return <></>;
-    } else {
-      return (
-        <div className="user-card-container">
-          <div className="user-picture">
-            <img
-              alt="profile picture"
-              className="profile-pic"
-              src={userData.images[0].url}
-            />
-          </div>
-          <div className="display-name">{userData.id}</div>
-          <div>{userData.followers.total} followers</div>
-        </div>
-      );
-    }
-  };
-
-  // const renderTopArtists = () => {
-  //   if (!recommendationButtonFlag) {
-  //     return (
-  //       <p>
-  //         We're sorry. There isn't enough information to create recommendtions
-  //         for you. You need to listen to some more music.
-  //       </p>
-  //     );
-  //   } else {
-  //     return <ArtistsComponent artists={userTopArtists} />;
-  //   }
-  // };
-
   // renders recommendation button after all useStates are filled up
   const renderRecommendationsButton = () => {
     if (!recommendationButtonFlag) {
       return (
         <div className="instruction-text lack-info">
           <p>
-          We're sorry. There isn't enough information to create recommendations
-          for you. You need to listen to some more music.
+            We're sorry. There isn't enough information to create
+            recommendations for you. You need to listen to some more music.
           </p>
           <p>😢</p>
         </div>
@@ -564,53 +512,6 @@ function Feed() {
     }
   };
 
-  const renderSpotifyRecommendationsButton = () => {
-    if (
-      userTopTracks.length >= 0 &&
-      userTestTracks.length >= 0 &&
-      spotifyResultsFlag === false &&
-      recommendationButtonFlag === true
-    ) {
-      return (
-        <div>
-          <p>
-            Do you want to get new song recommendations based on an already
-            existing Spotify algorithm? Click below.
-          </p>
-          <button onClick={() => handleSpotifyRecommendationsButtonCLick()}>
-            Get recommendations
-          </button>
-        </div>
-      );
-    } else {
-      return <></>;
-    }
-  };
-
-  const renderSpotifyRecommendationsResults = () => {
-    if (spotifyResultsFlag) {
-      const info = {
-        data: userSpotifyRecommendations,
-      };
-      return (
-        <div>
-          <div>
-            <CreatePlaylistButton
-              state="spotify"
-              user={userData}
-              songs={info}
-            />
-          </div>
-          <div>
-            <Results state={info} />
-          </div>
-        </div>
-      );
-    } else {
-      return <></>;
-    }
-  };
-
   const renderExperimentsDiv = () => {
     if (resultsFlag) {
       return (
@@ -638,7 +539,9 @@ function Feed() {
     // Add webpage that says there isn't enough information to create recommendations
     <div>
       <div className="navbar">
-        <div className="text-top">INVERSE REINFORCEMENT LEARNING</div>
+        <div className="text-top">
+          INVERSE REINFORCEMENT LEARNING
+        </div>
         {renderLogoutButton()}
       </div>
       <div className="webpage-container">
