@@ -2,6 +2,9 @@ import React, { useEffect, useState } from "react";
 
 import axios from "axios";
 
+// Styling
+import "./Results.css";
+
 function Results(props) {
   const [response, setResponse] = useState([]);
   const [results, setResults] = useState([]);
@@ -83,19 +86,23 @@ function Results(props) {
 
   const renderResults = () => {
     return (
-      <div>
+      <>
         {results.map((elem) => (
-          <div key={elem.id}>
-            <a href={elem.uri}>{elem.name}</a>
-            <p>{elem.artists[0].name}</p>
-            <img src={elem.album.images[2].url} alt="album_cover" />
-            <br></br>
-            <br></br>
-            <br></br>
-            <br></br>
+          <div className="result-wrapper" key={elem.id}>
+            <div className="result-cover">
+              <img className="album-pic" src={elem.album.images[2].url} alt="album_cover" />
+            </div>
+            <div className="result-song-artist">
+              <div className="result-text">
+                <a className="result-song" href={elem.uri}>{elem.name}</a>
+              </div>
+              <div className="result-text">
+                <p className="result-artist">{elem.artists[0].name}</p>
+              </div>
+            </div>
           </div>
         ))}
-      </div>
+      </>
     );
   };
 
@@ -104,9 +111,9 @@ function Results(props) {
       return <p>We're sorry, there are no more recommendations for you.</p>;
     } else {
       return (
-        <button onClick={() => handleLoadContentButtonCLick()}>
-          Load more content
-        </button>
+        <div className="more-content-button" onClick={() => handleLoadContentButtonCLick()}>
+          LOAD MORE CONTENT
+        </div>
       );
     }
   };
@@ -115,7 +122,7 @@ function Results(props) {
 
   return (
     <>
-      <div>{renderResults()}</div>
+      {renderResults()}
       <div>{renderLoadContentButton()}</div>
     </>
   );

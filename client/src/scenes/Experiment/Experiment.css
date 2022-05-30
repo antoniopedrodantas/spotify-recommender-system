@@ -1,0 +1,81 @@
+/* IMAGES */
+
+.spotify-images-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  margin-top: 1rem;
+}
+
+.spotify-image-wrapper-left {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-end;
+  padding: 1rem;
+}
+
+.spotify-image-wrapper-right {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 1rem;
+}
+
+.spotify-image {
+  height: 250px;
+}
+
+/* INSTRUCTIONS */
+
+.instructions-div {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.intro-question {
+  margin-top: 2rem;
+  font-size: large;
+  font-weight: bold;
+}
+
+.instructions-text {
+  margin-top: 1rem;
+  margin-left: 16rem;
+  margin-right: 16rem;
+}
+
+/* FORM */
+
+.form-button-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.form-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  background-color: var(--contrast-color);
+  width: 250px;
+  text-align: center;
+  height: 50px;
+  border: var(--contrast-color);
+  border-radius: 60px;
+  color: var(--text-color);
+  margin: 1rem;
+  font-weight: bold;
+  /* transition */
+  transition: all 0.5s ease;
+  transform: scale(1);
+}
+
+.form-button:hover {
+  cursor: pointer;
+  transform: scale(1.1);
+}

@@ -2,20 +2,30 @@ import React, { useEffect, useState } from "react";
 
 import axios from "axios";
 
+import "./Feed.css";
+
 import Results from "../../components/Results/Results";
 import CreatePlaylistButton from "../../components/CreatePlaylistButton/CreatePlaylistButton";
+
+// Styling
+import "./Feed.css";
 
 function Feed() {
   // user data state variable
   const [userData, setUserData] = useState({});
-  const [userTopArtists, setUserTopArtists] = useState([]);
   const [userTopTracks, setUserTopTracks] = useState([]);
   const [userTestTracks, setUserTestTracks] = useState([]);
 
   // holds values of server side response
   const [userRecommendations, setUserRecommendations] = useState({});
-  // flags tell if its ok to show the results component and the "Get Recommendations" button
   const [resultsFlag, setResultsFlag] = useState(false);
+
+  // flag tell if its ok to show the spotify results
+  const [userSpotifyRecommendations, setUserSpotifyRecommendations] = useState(
+    []
+  );
+
+  // flags tell if its ok to show the results component and the "Get Recommendations" button
   const [recommendationButtonFlag, setRecommendationButtonFlag] =
     useState(false);
 
@@ -156,6 +166,12 @@ function Feed() {
         localStorage.setItem("tokenType", token_type);
         localStorage.setItem("expiresIn", expires_in);
 
+        // clears useStates
+        setUserData({});
+        setUserTopTracks([]);
+        setUserTestTracks([]);
+        setUserSpotifyRecommendations([]);
+
         // gets user's info
         await axios
           .get(USER_INFO_ENDPOINT, {
@@ -189,17 +205,6 @@ function Feed() {
             }
 
             artists.forEach((element) => {
-              const artist = {
-                id: element.id,
-                name: element.name,
-                genres: element.genres,
-                popularity: element.popularity,
-              };
-              setUserTopArtists((userTopArtists) => [
-                ...userTopArtists,
-                artist,
-              ]);
-
               // adds to genres array the genre of each artist he is into
               if (element.genres[0] !== undefined) {
                 const newGenre = element.genres[0].replaceAll(" ", "_");
@@ -223,7 +228,49 @@ function Feed() {
           })
           .then((response) => {
             createUserTracks(response.data.items, access_token, "top", "");
-            console.log("Got top tracks data!");
+
+            // get spotify recommendations
+            let spotifyRecommendations = [];
+            response.data.items.forEach((track) => {
+              axios
+                .get(
+                  `https://api.spotify.com/v1/recommendations?seed_tracks=${track.id}`,
+                  {
+                    headers: {
+                      Authorization:
+                        "Bearer " + localStorage.getItem("accessToken"),
+                    },
+                  }
+                )
+                .then((response) => {
+                  const results = response.data.tracks;
+
+                  // gets the first two song recommendations for every track in userTopTracks
+                  if (results[0]) {
+                    const first_song = [
+                      results[0].id,
+                      results[0].name,
+                      results[0].artists[0].name,
+                      0,
+                    ];
+                    spotifyRecommendations.push(first_song);
+                  }
+
+                  if (results[1]) {
+                    const second_song = [
+                      results[1].id,
+                      results[1].name,
+                      results[1].artists[0].name,
+                      0,
+                    ];
+                    spotifyRecommendations.push(second_song);
+                  }
+                })
+                .catch((error) => {
+                  console.log(error);
+                });
+            });
+            setUserSpotifyRecommendations(spotifyRecommendations);
           })
           .catch((error) => {
             console.log(error);
@@ -260,6 +307,12 @@ function Feed() {
   // ============================================== Handlers ==============================================
 
   // sends request to the server through the click of the button
+  const handleLogoutButtonCLick = () => {
+    localStorage.clear();
+    window.location = "/";
+  };
+
+  // sends request to the server through the click of the button
   const handleRecommendationsButtonCLick = () => {
     // sends information to the server
     axios
@@ -276,20 +329,149 @@ function Feed() {
       });
   };
 
-  // sends request to the server through the click of the button
-  const handleLogoutButtonCLick = () => {
-    localStorage.clear();
-    window.location = "/";
-  };
+  async function handleExperimentsButton() {
+    // creates irl_recommenndations playlist
+    await axios
+      .post(
+        `https://api.spotify.com/v1/users/${userData.id}/playlists`,
+        {
+          name: "irl_recommendations",
+          public: false,
+        },
+        {
+          headers: {
+            Authorization: "Bearer " + localStorage.getItem("accessToken"),
+          },
+        }
+      )
+      .then((response) => {
+        // starts filling up the playlist with the recommended songs
+        let tracks = userRecommendations.data;
+        let ids = [];
+
+        for (let i = 0; i < 25; i++) {
+          // checks that it is not undefined
+          if (tracks[i]) {
+            ids.push("spotify:track:" + tracks[i][0]);
+          }
+        }
+
+        // adds songs to the playlist
+        axios
+          .post(
+            `https://api.spotify.com/v1/playlists/${response.data.id}/tracks`,
+            {
+              uris: ids,
+            },
+            {
+              headers: {
+                Authorization: "Bearer " + localStorage.getItem("accessToken"),
+              },
+            }
+          )
+          .then(() => {
+            console.log(`irl_recommendations playlist created succesfully!`);
+          })
+          .catch((error2) => {
+            console.log(error2);
+          });
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+
+    // creates spotify recommendations playlist
+    const info = {
+      data: userSpotifyRecommendations,
+    };
+    await axios
+      .post(
+        `https://api.spotify.com/v1/users/${userData.id}/playlists`,
+        {
+          name: "spotify_recommendations",
+          public: false,
+        },
+        {
+          headers: {
+            Authorization: "Bearer " + localStorage.getItem("accessToken"),
+          },
+        }
+      )
+      .then((response) => {
+        // starts filling up the playlist with the recommended songs
+        let tracks = info.data;
+        let ids = [];
+
+        for (let i = 0; i < 25; i++) {
+          // checks that it is not undefined
+          if (tracks[i]) {
+            ids.push("spotify:track:" + tracks[i][0]);
+          }
+        }
+
+        // adds songs to the playlist
+        axios
+          .post(
+            `https://api.spotify.com/v1/playlists/${response.data.id}/tracks`,
+            {
+              uris: ids,
+            },
+            {
+              headers: {
+                Authorization: "Bearer " + localStorage.getItem("accessToken"),
+              },
+            }
+          )
+          .then(() => {
+            console.log(
+              `spotify_recommendations playlist created succesfully!`
+            );
+          })
+          .catch((error2) => {
+            console.log(error2);
+          });
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+
+    setTimeout(() => {
+      // redirects the user to a new webpage
+      window.location = `/experiment#access_token=${localStorage.getItem(
+        "accessToken"
+      )}`;
+    }, 500);
+  }
 
   // ============================================== Renders ==============================================
 
   const renderLogoutButton = () => {
-    return <button onClick={() => handleLogoutButtonCLick()}>Logout</button>;
+    return (
+      <div className="logout-button-container">
+        <button
+          className="logout-button"
+          onClick={() => handleLogoutButtonCLick()}
+        >
+          LOGOUT
+        </button>
+      </div>
+    );
   };
 
   // renders recommendation button after all useStates are filled up
   const renderRecommendationsButton = () => {
+    if (!recommendationButtonFlag) {
+      return (
+        <div className="instruction-text lack-info">
+          <p>
+            We're sorry. There isn't enough information to create
+            recommendations for you. You need to listen to some more music.
+          </p>
+          <p>😢</p>
+        </div>
+      );
+    }
+
     if (
       userTopTracks.length >= 0 &&
       userTestTracks.length >= 0 &&
@@ -297,14 +479,13 @@ function Feed() {
       recommendationButtonFlag === true
     ) {
       return (
-        <div>
-          <p>
-            Do you want to get new song recommendations based on an IRL
-            approach? Click below.
-          </p>
-          <button onClick={() => handleRecommendationsButtonCLick()}>
-            Get recommendations
-          </button>
+        <div className="recommendations-wrapper webpage-item">
+          <div
+            className="recommendations-button"
+            onClick={() => handleRecommendationsButtonCLick()}
+          >
+            GET RECOMMENDATIONS
+          </div>
         </div>
       );
     } else {
@@ -312,38 +493,38 @@ function Feed() {
     }
   };
 
-  const renderTopArtists = () => {
-    if (!recommendationButtonFlag) {
-      return (
-        <p>
-          We're sorry. There isn't enough information to create recommendtions
-          for you. You need to listen to some more music.
-        </p>
-      );
-    } else {
-      let artists = "";
-      userTopArtists.forEach((artist) => {
-        artists = artists + ", " + artist.name;
-      });
-      artists = artists + ".";
-      return (
-        <div>
-          <p>We can already see you're a big fan of:</p>
-          <p>{artists}</p>
-        </div>
-      );
-    }
-  };
-
   const renderRecommendationsResults = () => {
     if (resultsFlag) {
       return (
-        <div>
-          <div>
-            <CreatePlaylistButton state={userData} songs={userRecommendations} />
+        <div className="recommendations-wrapper webpage-item recommendations-container">
+          <div className="create-playlist-wrapper">
+            <CreatePlaylistButton
+              state="irl"
+              user={userData}
+              songs={userRecommendations}
+            />
           </div>
-          <div>
-            <Results state={userRecommendations} />
+          <Results state={userRecommendations} />
+        </div>
+      );
+    } else {
+      return <></>;
+    }
+  };
+
+  const renderExperimentsDiv = () => {
+    if (resultsFlag) {
+      return (
+        <div
+          className="experiments-div"
+          onClick={() => handleExperimentsButton()}
+        >
+          <div className="text-link">
+            WANT TO HELP US ENHANCE OUR ALGORITHM?
+          </div>
+          <div className="text-miniscule">
+            THIS IMPLIES LISTENING TO TWO DIFFERENT SUGGESTION PLAYLISTS AND
+            ANSWERING A SMALL SURVEY
           </div>
         </div>
       );
@@ -355,17 +536,26 @@ function Feed() {
   // ============================================== return ==============================================
 
   return (
+    // Add webpage that says there isn't enough information to create recommendations
     <div>
-      {renderLogoutButton()}
-      <p>
-        Hello, {userData.display_name}. Welcome to our Spotify recommendation
-        system.
-      </p>
-      <br></br>
-      {renderTopArtists()}
-      <br></br>
-      {renderRecommendationsButton()}
-      {renderRecommendationsResults()}
+      <div className="navbar">
+        <div className="text-top">
+          INVERSE REINFORCEMENT LEARNING
+        </div>
+        {renderLogoutButton()}
+      </div>
+      <div className="webpage-container">
+        <div className="instruction-text webpage-item">
+          WELCOME, {String(userData.display_name).toUpperCase()}. THE INVERSE REINFORCEMENT LEARNING
+          RECOMMENDER SYSTEM ALLOWS YOU TO GENERATE MUSIC RECOMMENDATIONS THAT
+          WERE ATTRIBUTED TO YOU. IT USES IRL TO TEST ITS SUCCESS ON INFERRING
+          USER PREFERENCES. YOU CAN CHECK OUT YOUR RECOMMENDATIONS RIGHT HERE OR
+          IMPORT THEM TO A PLAYLIST ON YOUR SPOTIFY ACCOUNT.
+        </div>
+        {renderRecommendationsButton()}
+        {renderRecommendationsResults()}
+        {renderExperimentsDiv()}
+      </div>
     </div>
   );
 }

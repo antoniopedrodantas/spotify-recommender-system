@@ -1,0 +1,178 @@
+/* NAVBAR */
+
+.navbar {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+.text-top {
+  font-size: x-large;
+  font-weight: bold;
+  margin: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+/* LOGOUT BUTTON */
+
+.logout-button-container {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.logout-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  background-color: var(--contrast-color);
+  width: 100px;
+  text-align: center;
+  height: 50px;
+  border: var(--contrast-color);
+  border-radius: 60px;
+  color: var(--text-color);
+  margin: 1rem;
+  font-weight: bold;
+  /* transition */
+  transition: all 0.5s ease;
+  transform: scale(1);
+}
+
+.logout-button:hover {
+  cursor: pointer;
+  transform: scale(1.1);
+}
+
+/* WEBPAGE CONTAINER */
+
+.webpage-container {
+  display: grid;
+  grid-template-columns: 1fr;
+  margin: 1rem;
+}
+
+.webpage-item {
+  padding: 1rem;
+}
+
+.instruction-text {
+  font-size: large;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.lack-info {
+  margin-top: 2rem;
+}
+
+/* USER CARD */
+
+.user-card-container {
+  /* background-color: var(--secondary-color); */
+  width: 100%;
+  height: 500px;
+  border: 4px var(--contrast-color);
+  border-radius: 50px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: top;
+  text-align: center;
+}
+
+.user-picture {
+  margin-top: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.profile-pic {
+  height: 200px;
+  border: solid 4px var(--contrast-color);
+  border-radius: 50%;
+}
+
+.display-name {
+  margin-top: 1rem;
+}
+
+/* RECOMMENDATIONS */
+
+.recommendations-wrapper {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.recommendations-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  background-color: var(--contrast-color);
+  width: 400px;
+  text-align: center;
+  height: 50px;
+  border: var(--contrast-color);
+  border-radius: 60px;
+  color: var(--text-color);
+  font-weight: bold;
+  /* transition */
+  transition: all 0.5s ease;
+  transform: scale(1);
+}
+
+.recommendations-button:hover {
+  cursor: pointer;
+  transform: scale(1.1);
+}
+
+.recommendations-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  height: 400px;
+  overflow-y: auto;
+}
+
+.create-playlist-wrapper {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+/* EXPERIMENTS */
+
+.experiments-div {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin-top: 4rem;
+  /* transition */
+  transition: all 0.5s ease;
+  transform: scale(1);
+}
+
+.experiments-div:hover {
+  cursor: pointer;
+  transform: scale(1.1);
+}
+
+.text-link {
+  font-weight: bold;
+}
+
+.text-miniscule {
+  font-size: x-small;
+}
