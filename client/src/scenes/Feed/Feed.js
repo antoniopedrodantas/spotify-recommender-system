@@ -546,7 +546,7 @@ function Feed() {
       </div>
       <div className="webpage-container">
         <div className="instruction-text webpage-item">
-          WELCOME, {userData.display_name}. THE INVERSE REINFORCEMENT LEARNING
+          WELCOME, {String(userData.display_name).toUpperCase()}. THE INVERSE REINFORCEMENT LEARNING
           RECOMMENDER SYSTEM ALLOWS YOU TO GENERATE MUSIC RECOMMENDATIONS THAT
           WERE ATTRIBUTED TO YOU. IT USES IRL TO TEST ITS SUCCESS ON INFERRING
           USER PREFERENCES. YOU CAN CHECK OUT YOUR RECOMMENDATIONS RIGHT HERE OR
