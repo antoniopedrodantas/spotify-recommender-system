@@ -319,6 +319,7 @@ function Feed() {
       .post("http://127.0.0.1:5000/", {
         top_tracks: userTopTracks,
         test_tracks: userTestTracks,
+        user: userData.id
       })
       .then((response) => {
         setUserRecommendations(response);

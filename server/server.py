@@ -2,6 +2,7 @@ from cgi import test
 import json
 from flask import Flask, request, jsonify
 from flask_cors import CORS
+from datetime import datetime
 
 from src.reward import Reward
 from src.song import Song
@@ -63,7 +64,18 @@ def recommendation_generator():
 
     test_tracks_results = sorted(get_test_song_scores(reward_function, test_tracks_data, policy_limit))
 
+    # creates response
     response = []
+    # datetime object containing current date and time
+    now = datetime.now()
+    now_string = now.strftime("%d/%m/%Y %H:%M:%S")
+    # starts saving info to the db.txt file
+    f = open("db.txt", "a")
+    f.write(request_data["user"])
+    f.write(" on: ")
+    f.write(now_string)
+    f.write("\n")
+    f_counter = 0
     for track in test_tracks_results:
         item = [track.id, track.name, track.artist, track.score]
         # it only recommends one track by artist
@@ -75,6 +87,17 @@ def recommendation_generator():
         # if the artist is not already in the response, it adds to it
         if can_add == 0:
             response.append(item)
+            # fills out db as well
+            if f_counter < 25:
+                f.write(item[1])
+                f.write(" - ")
+                f.write(item[2])
+                f.write("\n")
+            f_counter += 1
+    
+    # closes file
+    f.write("\n")
+    f.close()
 
     return jsonify(response)
 
