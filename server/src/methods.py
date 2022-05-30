@@ -154,6 +154,6 @@ def get_test_song_scores(reward_function, tracks_data, policy_limit):
                 track_score += abs(reward_function[genre].valence - track["valence"])
             
             if track_score < policy_limit[genre]:
-                song_results.append(Song(track["id"], track["name"], track["artist"], track_score))
+                song_results.append(Song(track["id"], track["name"], track["artist"], track_score, track["genre"]))
 
     return song_results

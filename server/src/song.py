@@ -1,10 +1,11 @@
 class Song:
 
-    def __init__(self, id, name, artist, score):
+    def __init__(self, id, name, artist, score, genre):
         self.id = id
         self.name = name
         self.artist = artist
         self.score = score
+        self.genre = genre
 
     def __lt__(self, obj):
         return ((self.score) < (obj.score))

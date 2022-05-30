@@ -77,7 +77,7 @@ def recommendation_generator():
     f.write("\n")
     f_counter = 0
     for track in test_tracks_results:
-        item = [track.id, track.name, track.artist, track.score]
+        item = [track.id, track.name, track.artist, track.score, track.genre]
         # it only recommends one track by artist
         can_add = 0
         for track_cmp in response:
@@ -92,6 +92,9 @@ def recommendation_generator():
                 f.write(item[1])
                 f.write(" - ")
                 f.write(item[2])
+                f.write(" [")
+                f.write(item[4])
+                f.write("]")
                 f.write("\n")
             f_counter += 1
     
