@@ -1,7 +1,12 @@
 .result-wrapper {
   width: 100%;
-  display: grid;
-  grid-template-columns: 1fr 3fr;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 2px;
+  /* display: grid;
+  grid-template-columns: 1fr 3fr; */
 }
 
 .result-cover {

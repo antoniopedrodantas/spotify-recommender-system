@@ -21,7 +21,9 @@ function Results(props) {
     let ids = "";
 
     for (let i = 0; i < 50; i++) {
-      ids += tracks[i][0] + ",";
+      if (tracks[i]) {
+        ids += tracks[i][0] + ",";
+      }
     }
 
     ids = ids.substring(0, ids.length - 1);
@@ -89,17 +91,32 @@ function Results(props) {
       <>
         {results.map((elem) => (
           <div className="result-wrapper" key={elem.id}>
-            <div className="result-cover">
-              <img className="album-pic" src={elem.album.images[2].url} alt="album_cover" />
+            {/* <div className="result-cover">
+              <img
+                className="album-pic"
+                src={elem.album.images[2].url}
+                alt="album_cover"
+              />
             </div>
             <div className="result-song-artist">
               <div className="result-text">
-                <a className="result-song" href={elem.uri}>{elem.name}</a>
+                <a className="result-song" href={elem.uri}>
+                  {elem.name}
+                </a>
               </div>
               <div className="result-text">
                 <p className="result-artist">{elem.artists[0].name}</p>
               </div>
-            </div>
+            </div> */}
+            <iframe
+              style={{ borderRadius: "12px" }}
+              src={`https://open.spotify.com/embed/track/${elem.id}?utm_source=generator&theme=0`}
+              width="100%"
+              height="80"
+              frameBorder="0"
+              allowFullScreen=""
+              allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+            ></iframe>
           </div>
         ))}
       </>
@@ -108,11 +125,20 @@ function Results(props) {
 
   const renderLoadContentButton = () => {
     if (noMoreContent) {
-      return <p>We're sorry, there are no more recommendations for you.</p>;
+      return (
+        <div className="create-playlist-wrapper">
+          <div>We're sorry, there are no more recommendations for you.</div>
+        </div>
+      );
     } else {
       return (
-        <div className="more-content-button" onClick={() => handleLoadContentButtonCLick()}>
-          LOAD MORE CONTENT
+        <div className="create-playlist-wrapper">
+          <div
+            className="more-content-button"
+            onClick={() => handleLoadContentButtonCLick()}
+          >
+            LOAD MORE CONTENT
+          </div>
         </div>
       );
     }
